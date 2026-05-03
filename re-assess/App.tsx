@@ -112,7 +112,7 @@ const App: React.FC = () => {
       setMaxReachedStep(Math.max(maxReachedStep, 2));
     } catch (error) {
       console.error(error);
-      alert('שגיאה בניתוח המטלה. אנא נסה שנית.');
+      alert('שגיאה בניתוח המטלה (שלב 1). פרטי שגיאה: ' + (error instanceof Error ? error.message : JSON.stringify(error)));
     } finally {
       setLoading(false);
     }
