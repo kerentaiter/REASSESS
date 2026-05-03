@@ -459,7 +459,8 @@ var analyzeBloomTaxonomy = async (assignmentText, fileData) => {
       }
     }
   });
-  return JSON.parse(response.text);
+  const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
+  return JSON.parse(cleanedText);
 };
 var generateAssessmentStrategies = async (skills, numStudents) => {
   const response = await ai.models.generateContent({
@@ -500,7 +501,11 @@ var generateAssessmentStrategies = async (skills, numStudents) => {
       }
     }
   });
-  const res = JSON.parse(response.text);
+  const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
+  let res = JSON.parse(cleanedText);
+  if (res && !Array.isArray(res)) {
+    res = res.strategies || res.items || res.data || Object.values(res)[0] || [];
+  }
   return res.map((item, index) => ({
     ...item,
     id: `group-${index}-${Date.now()}`
@@ -554,7 +559,8 @@ var rephraseAssignment = async (originalText, targetSkills, strategies, numStude
       }
     }
   });
-  return JSON.parse(response.text);
+  const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
+  return JSON.parse(cleanedText);
 };
 var askFollowUpQuestion = async (context, question, history) => {
   const chat = ai.chats.create({
@@ -594,7 +600,8 @@ var generateRubric = async (revisedSections) => {
       }
     }
   });
-  return JSON.parse(response.text);
+  const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
+  return JSON.parse(cleanedText);
 };
 
 // components/StepFinalResult.tsx

@@ -69,7 +69,8 @@ export const analyzeBloomTaxonomy = async (assignmentText: string, fileData?: { 
     }
   });
 
-  return JSON.parse(response.text);
+  const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
+  return JSON.parse(cleanedText);
 };
 
 export const generateAssessmentStrategies = async (skills: Skill[], numStudents: number) => {
@@ -112,7 +113,12 @@ export const generateAssessmentStrategies = async (skills: Skill[], numStudents:
     }
   });
 
-  const res = JSON.parse(response.text);
+  const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
+  let res = JSON.parse(cleanedText);
+  if (res && !Array.isArray(res)) {
+    // Sometimes Gemini ignores the top-level array schema and wraps it in an object
+    res = res.strategies || res.items || res.data || Object.values(res)[0] || [];
+  }
   return res.map((item: any, index: number) => ({
     ...item,
     id: `group-${index}-${Date.now()}`
@@ -186,7 +192,8 @@ export const rephraseAssignment = async (originalText: string, targetSkills: Ski
       }
     }
   });
-  return JSON.parse(response.text) as RephrasedResult;
+  const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
+  return JSON.parse(cleanedText) as RephrasedResult;
 };
 
 export const askFollowUpQuestion = async (
@@ -236,5 +243,6 @@ export const generateRubric = async (revisedSections: TaskSection[]) => {
       }
     }
   });
-  return JSON.parse(response.text) as RubricRow[];
+  const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
+  return JSON.parse(cleanedText) as RubricRow[];
 };
