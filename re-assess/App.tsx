@@ -16,6 +16,7 @@ import {
   askFollowUpQuestion,
   TaskSection
 } from './services/geminiService';
+import { logUsage } from './services/supabaseService';
 
 interface SectionState extends TaskSection {
   status: 'pending' | 'approved' | 'removed';
@@ -99,6 +100,11 @@ const App: React.FC = () => {
     try {
       const filePayload = uploadedFile ? { data: uploadedFile.data, mimeType: uploadedFile.mimeType } : undefined;
       const analysis = await analyzeBloomTaxonomy(textToAnalyze, filePayload);
+      logUsage('start_redesign', { 
+        hasFile: !!uploadedFile, 
+        textLength: textToAnalyze.length,
+        numStudents 
+      });
       setBloomAnalysis(analysis);
       setSelectedSkills(analysis.currentSkills);
       setCustomSkills([]);
@@ -142,6 +148,10 @@ const App: React.FC = () => {
     setLoading(true);
     try {
       const res = await generateAssessmentStrategies(selectedSkills, numStudents);
+      logUsage('generate_strategies', { 
+        numSkillsSelected: selectedSkills.length,
+        numStudents 
+      });
       setStrategies(res.map((s: any) => ({ ...s, userSelectedCategory: s.type, userSelectedMethod: s.method })));
       setStep(3);
       setMaxReachedStep(Math.max(maxReachedStep, 3));
@@ -194,6 +204,10 @@ const App: React.FC = () => {
     setLoading(true);
     try {
       const { sections, practicalTips } = await rephraseAssignment(assignmentText, selectedSkills, strategies, numStudents);
+      logUsage('finish_rephrase', { 
+        numSections: sections.length,
+        numStrategiesSelected: strategies.filter(s => s.userSelectedMethod).length
+      });
       setRevisedSections(sections.map(s => ({ ...s, status: 'pending', isEditing: false })));
       setPracticalTips(practicalTips);
       setStep(4);
