@@ -849,6 +849,30 @@ var Stepper_default = Stepper;
 
 // App.tsx
 import mammoth from "mammoth";
+
+// services/supabaseService.ts
+import { createClient } from "@supabase/supabase-js";
+var SUPABASE_URL = "https://vpuxnkudhaflyygpnxvq.supabase.co";
+var SUPABASE_KEY = "sb_publishable_ocgrUJbuEg9pXckWm7IivQ_kaMiO-EG";
+var supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+var logUsage = async (actionName, eventData = {}) => {
+  try {
+    const { error } = await supabase.from("usage_logs").insert([
+      {
+        action: actionName,
+        data: eventData,
+        created_at: (/* @__PURE__ */ new Date()).toISOString()
+      }
+    ]);
+    if (error) {
+      console.error("Error logging to Supabase:", error);
+    }
+  } catch (err) {
+    console.error("Exception logging to Supabase:", err);
+  }
+};
+
+// App.tsx
 import { jsx as jsx8, jsxs as jsxs8 } from "react/jsx-runtime";
 var App = () => {
   const [mode, setMode] = useState4("HOME");
@@ -917,6 +941,11 @@ var App = () => {
     try {
       const filePayload = uploadedFile ? { data: uploadedFile.data, mimeType: uploadedFile.mimeType } : void 0;
       const analysis = await analyzeBloomTaxonomy(textToAnalyze, filePayload);
+      logUsage("start_redesign", {
+        hasFile: !!uploadedFile,
+        textLength: textToAnalyze.length,
+        numStudents
+      });
       setBloomAnalysis(analysis);
       setSelectedSkills(analysis.currentSkills);
       setCustomSkills([]);
@@ -953,6 +982,10 @@ var App = () => {
     setLoading(true);
     try {
       const res = await generateAssessmentStrategies(selectedSkills, numStudents);
+      logUsage("generate_strategies", {
+        numSkillsSelected: selectedSkills.length,
+        numStudents
+      });
       setStrategies(res.map((s) => ({ ...s, userSelectedCategory: s.type, userSelectedMethod: s.method })));
       setStep(3);
       setMaxReachedStep(Math.max(maxReachedStep, 3));
@@ -1000,6 +1033,10 @@ var App = () => {
     setLoading(true);
     try {
       const { sections, practicalTips: practicalTips2 } = await rephraseAssignment(assignmentText, selectedSkills, strategies, numStudents);
+      logUsage("finish_rephrase", {
+        numSections: sections.length,
+        numStrategiesSelected: strategies.filter((s) => s.userSelectedMethod).length
+      });
       setRevisedSections(sections.map((s) => ({ ...s, status: "pending", isEditing: false })));
       setPracticalTips(practicalTips2);
       setStep(4);
