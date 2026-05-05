@@ -1,11 +1,11 @@
-// index.tsx
+// ../REASSESS_github/re-assess/index.tsx
 import React5 from "react";
 import ReactDOM from "react-dom/client";
 
-// App.tsx
+// ../REASSESS_github/re-assess/App.tsx
 import { useState as useState4 } from "react";
 
-// components/Layout.tsx
+// ../REASSESS_github/re-assess/components/Layout.tsx
 import { jsx, jsxs } from "react/jsx-runtime";
 var Layout = ({ children, title, onBack }) => {
   return /* @__PURE__ */ jsxs("div", { className: "min-h-screen flex flex-col items-center p-4 md:p-8", children: [
@@ -36,7 +36,7 @@ var Layout = ({ children, title, onBack }) => {
 };
 var Layout_default = Layout;
 
-// components/InfoBox.tsx
+// ../REASSESS_github/re-assess/components/InfoBox.tsx
 import { jsx as jsx2, jsxs as jsxs2 } from "react/jsx-runtime";
 var InfoBox = ({ title, children, variant = "info" }) => {
   const colors = {
@@ -53,7 +53,7 @@ var InfoBox = ({ title, children, variant = "info" }) => {
   ] });
 };
 
-// components/StepInput.tsx
+// ../REASSESS_github/re-assess/components/StepInput.tsx
 import { jsx as jsx3, jsxs as jsxs3 } from "react/jsx-runtime";
 var StepInput = ({
   assignmentText,
@@ -118,10 +118,10 @@ var StepInput = ({
 };
 var StepInput_default = StepInput;
 
-// components/StepSkillsAnalysis.tsx
+// ../REASSESS_github/re-assess/components/StepSkillsAnalysis.tsx
 import { useState, useMemo } from "react";
 
-// types.ts
+// ../REASSESS_github/re-assess/types.ts
 var BloomLevel = /* @__PURE__ */ ((BloomLevel2) => {
   BloomLevel2["Remember"] = "\u05D6\u05DB\u05D9\u05E8\u05D4";
   BloomLevel2["Understand"] = "\u05D4\u05D1\u05E0\u05D4";
@@ -132,7 +132,7 @@ var BloomLevel = /* @__PURE__ */ ((BloomLevel2) => {
   return BloomLevel2;
 })(BloomLevel || {});
 
-// components/StepSkillsAnalysis.tsx
+// ../REASSESS_github/re-assess/components/StepSkillsAnalysis.tsx
 import { jsx as jsx4, jsxs as jsxs4 } from "react/jsx-runtime";
 var StepSkillsAnalysis = ({
   bloomAnalysis,
@@ -265,7 +265,7 @@ var StepSkillsAnalysis = ({
 };
 var StepSkillsAnalysis_default = StepSkillsAnalysis;
 
-// components/StepStrategyBuilder.tsx
+// ../REASSESS_github/re-assess/components/StepStrategyBuilder.tsx
 import { useState as useState2 } from "react";
 import { jsx as jsx5, jsxs as jsxs5 } from "react/jsx-runtime";
 var CATEGORIZED_OPTIONS = {
@@ -395,12 +395,12 @@ var StepStrategyBuilder = ({
 };
 var StepStrategyBuilder_default = StepStrategyBuilder;
 
-// components/StepFinalResult.tsx
+// ../REASSESS_github/re-assess/components/StepFinalResult.tsx
 import { useState as useState3, useRef, useEffect } from "react";
 
-// services/geminiService.ts
+// ../REASSESS_github/re-assess/services/geminiService.ts
 import { GoogleGenAI, Type } from "@google/genai";
-var API_KEY = "AIzaSyC5bGVjBaK9LCj8-Z4x2ywCyBQ-6RikLz0";
+var API_KEY = "AIzaSyDfSZ_yNEj-8tkWPN-I7M56gx5_vBIE_0A";
 var ai = new GoogleGenAI({ apiKey: API_KEY });
 var analyzeBloomTaxonomy = async (assignmentText, fileData) => {
   const parts = [];
@@ -604,7 +604,7 @@ var generateRubric = async (revisedSections) => {
   return JSON.parse(cleanedText);
 };
 
-// components/StepFinalResult.tsx
+// ../REASSESS_github/re-assess/components/StepFinalResult.tsx
 import { jsx as jsx6, jsxs as jsxs6 } from "react/jsx-runtime";
 var renderMarkdown = (text) => {
   const cleanText = text.replace(/\*/g, "");
@@ -805,7 +805,7 @@ ${rows}`;
 };
 var StepFinalResult_default = StepFinalResult;
 
-// components/Stepper.tsx
+// ../REASSESS_github/re-assess/components/Stepper.tsx
 import { jsx as jsx7, jsxs as jsxs7 } from "react/jsx-runtime";
 var steps = [
   { id: 1, label: "\u05D4\u05D6\u05E0\u05EA \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD" },
@@ -854,10 +854,10 @@ var Stepper = ({ currentStep, onStepClick, maxReachedStep }) => {
 };
 var Stepper_default = Stepper;
 
-// App.tsx
+// ../REASSESS_github/re-assess/App.tsx
 import mammoth from "mammoth";
 
-// services/supabaseService.ts
+// ../REASSESS_github/re-assess/services/supabaseService.ts
 import { createClient } from "@supabase/supabase-js";
 var SUPABASE_URL = "https://vpuxnkudhaflyygpnxvq.supabase.co";
 var SUPABASE_KEY = "sb_publishable_ocgrUJbuEg9pXckWm7IivQ_kaMiO-EG";
@@ -879,7 +879,7 @@ var logUsage = async (actionName, eventData = {}) => {
   }
 };
 
-// App.tsx
+// ../REASSESS_github/re-assess/App.tsx
 import { jsx as jsx8, jsxs as jsxs8 } from "react/jsx-runtime";
 var App = () => {
   const [mode, setMode] = useState4("HOME");
@@ -1205,7 +1205,7 @@ var App = () => {
 };
 var App_default = App;
 
-// index.tsx
+// ../REASSESS_github/re-assess/index.tsx
 import { jsx as jsx9 } from "react/jsx-runtime";
 var rootElement = document.getElementById("root");
 if (!rootElement) {
