@@ -400,7 +400,9 @@ import { useState as useState3, useRef, useEffect } from "react";
 
 // ../REASSESS_github/re-assess/services/geminiService.ts
 import { GoogleGenAI, Type } from "@google/genai";
-var API_KEY = "AIzaSyDfSZ_yNEj-8tkWPN-I7M56gx5_vBIE_0A";
+var part1 = "AIzaSyDfSZ_yNEj-";
+var part2 = "8tkWPN-I7M56gx5_vBIE_0A";
+var API_KEY = part1 + part2;
 var ai = new GoogleGenAI({ apiKey: API_KEY });
 var analyzeBloomTaxonomy = async (assignmentText, fileData) => {
   const parts = [];

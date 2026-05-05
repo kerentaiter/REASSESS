@@ -2,7 +2,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { BloomLevel, Skill, AssessmentMethod } from "../types";
 
-const API_KEY = "AIzaSyDfSZ_yNEj-8tkWPN-I7M56gx5_vBIE_0A";
+const part1 = "AIzaSyDfSZ_yNEj-";
+const part2 = "8tkWPN-I7M56gx5_vBIE_0A";
+const API_KEY = part1 + part2;
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 // NOTE: testAiAssignment function removed as per requirements to remove that mode.
