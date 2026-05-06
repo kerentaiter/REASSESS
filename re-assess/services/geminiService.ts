@@ -2,8 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { BloomLevel, Skill, AssessmentMethod } from "../types";
 
-const part1 = "AIzaSyDfSZ_yNEj-";
-const part2 = "8tkWPN-I7M56gx5_vBIE_0A";
+const part1 = "AIzaSyBl_Of_sUNgHv_";
+const part2 = "NUvEfccXZQBucDPtM91M";
 const API_KEY = part1 + part2;
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
