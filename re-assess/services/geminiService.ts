@@ -7,6 +7,29 @@ const part2 = "NUvEfccXZQBucDPtM91M";
 const API_KEY = part1 + part2;
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const withRetry = async <T>(fn: () => Promise<T>, retries = 5, waitMs = 10000): Promise<T> => {
+  let attempt = 0;
+  while (attempt < retries) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      attempt++;
+      const isRateLimit = error?.status === 429 || error?.message?.includes('429') || error?.message?.includes('quota') || error?.message?.includes('overloaded') || error?.message?.includes('Too Many Requests');
+      if (isRateLimit && attempt < retries) {
+        console.warn(`Rate limit hit. Waiting ${waitMs/1000}s before retry ${attempt}/${retries}...`);
+        await delay(waitMs);
+      } else if (attempt >= retries && isRateLimit) {
+        throw new Error("המערכת בעומס קריאות כרגע (עקב מגבלות API). אנא נסה שוב בעוד מספר דקות.");
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error("המערכת בעומס קריאות כרגע (עקב מגבלות API). אנא נסה שוב בעוד מספר דקות.");
+};
+
 // NOTE: testAiAssignment function removed as per requirements to remove that mode.
 
 export const analyzeBloomTaxonomy = async (assignmentText: string, fileData?: { data: string, mimeType: string }) => {
@@ -33,7 +56,7 @@ export const analyzeBloomTaxonomy = async (assignmentText: string, fileData?: { 
     המטלה (טקסט ו/או קובץ מצורף): ${assignmentText}`
   });
 
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: 'gemini-3.1-flash-lite-preview',
     contents: { parts },
     config: {
@@ -69,14 +92,14 @@ export const analyzeBloomTaxonomy = async (assignmentText: string, fileData?: { 
         required: ["currentSkills", "suggestedSkills"]
       }
     }
-  });
+  }));
 
   const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
   return JSON.parse(cleanedText);
 };
 
 export const generateAssessmentStrategies = async (skills: Skill[], numStudents: number) => {
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: 'gemini-3.1-flash-lite-preview',
     contents: `עבור רשימת המיומנויות הבאה וכיתה של ${numStudents} סטודנטים, בנה תהליך הערכה המורכב מ-2 עד 3 חלקים (קבוצות הערכה).
     
@@ -113,7 +136,7 @@ export const generateAssessmentStrategies = async (skills: Skill[], numStudents:
         }
       }
     }
-  });
+  }));
 
   const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
   let res = JSON.parse(cleanedText);
@@ -151,7 +174,7 @@ export const rephraseAssignment = async (originalText: string, targetSkills: Ski
     Submission: 'הערכה בסביבה פתוחה'
   };
 
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: 'gemini-3.1-flash-lite-preview',
     contents: `נסח מחדש את המטלה המקורית למטלה אקדמית מעודכנת. המטרה היא יצירת "משימת הערכה" שלמה ומפורטת.
     
@@ -193,7 +216,7 @@ export const rephraseAssignment = async (originalText: string, targetSkills: Ski
         required: ["sections", "practicalTips"]
       }
     }
-  });
+  }));
   const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
   return JSON.parse(cleanedText) as RephrasedResult;
 };
@@ -209,7 +232,7 @@ export const askFollowUpQuestion = async (
       systemInstruction: `אתה עוזר פדגוגי מומחה. התמקד בחיבור לתוכן שנלמד בשיעור ובשיטות הערכה מגוונות.`,
     }
   });
-  const response = await chat.sendMessage({ message: question });
+  const response = await withRetry(() => chat.sendMessage({ message: question }));
   return response.text;
 };
 
@@ -219,7 +242,7 @@ export const generateRubric = async (revisedSections: TaskSection[]) => {
     .map(s => s.content)
     .join('\n');
 
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: 'gemini-3.1-flash-lite-preview',
     contents: `צור מחוון הערכה (Rubric) מלא עבור המטלה הבאה.
     הקריטריונים צריכים לכלול היבטים כמו: איכות התוכן, חשיבה ביקורתית, שימוש מושכל ב-AI (אם רלוונטי), איכות הפרזנטציה/כתיבה, ורפלקציה.
@@ -244,7 +267,7 @@ export const generateRubric = async (revisedSections: TaskSection[]) => {
         }
       }
     }
-  });
+  }));
   const cleanedText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
   return JSON.parse(cleanedText) as RubricRow[];
 };

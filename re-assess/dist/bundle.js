@@ -404,6 +404,27 @@ var part1 = "AIzaSyBl_Of_sUNgHv_";
 var part2 = "NUvEfccXZQBucDPtM91M";
 var API_KEY = part1 + part2;
 var ai = new GoogleGenAI({ apiKey: API_KEY });
+var delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+var withRetry = async (fn, retries = 5, waitMs = 1e4) => {
+  let attempt = 0;
+  while (attempt < retries) {
+    try {
+      return await fn();
+    } catch (error) {
+      attempt++;
+      const isRateLimit = error?.status === 429 || error?.message?.includes("429") || error?.message?.includes("quota") || error?.message?.includes("overloaded") || error?.message?.includes("Too Many Requests");
+      if (isRateLimit && attempt < retries) {
+        console.warn(`Rate limit hit. Waiting ${waitMs / 1e3}s before retry ${attempt}/${retries}...`);
+        await delay(waitMs);
+      } else if (attempt >= retries && isRateLimit) {
+        throw new Error("\u05D4\u05DE\u05E2\u05E8\u05DB\u05EA \u05D1\u05E2\u05D5\u05DE\u05E1 \u05E7\u05E8\u05D9\u05D0\u05D5\u05EA \u05DB\u05E8\u05D2\u05E2 (\u05E2\u05E7\u05D1 \u05DE\u05D2\u05D1\u05DC\u05D5\u05EA API). \u05D0\u05E0\u05D0 \u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1 \u05D1\u05E2\u05D5\u05D3 \u05DE\u05E1\u05E4\u05E8 \u05D3\u05E7\u05D5\u05EA.");
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error("\u05D4\u05DE\u05E2\u05E8\u05DB\u05EA \u05D1\u05E2\u05D5\u05DE\u05E1 \u05E7\u05E8\u05D9\u05D0\u05D5\u05EA \u05DB\u05E8\u05D2\u05E2 (\u05E2\u05E7\u05D1 \u05DE\u05D2\u05D1\u05DC\u05D5\u05EA API). \u05D0\u05E0\u05D0 \u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1 \u05D1\u05E2\u05D5\u05D3 \u05DE\u05E1\u05E4\u05E8 \u05D3\u05E7\u05D5\u05EA.");
+};
 var analyzeBloomTaxonomy = async (assignmentText, fileData) => {
   const parts = [];
   if (fileData) {
@@ -424,7 +445,7 @@ var analyzeBloomTaxonomy = async (assignmentText, fileData) => {
     
     \u05D4\u05DE\u05D8\u05DC\u05D4 (\u05D8\u05E7\u05E1\u05D8 \u05D5/\u05D0\u05D5 \u05E7\u05D5\u05D1\u05E5 \u05DE\u05E6\u05D5\u05E8\u05E3): ${assignmentText}`
   });
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: "gemini-3.1-flash-lite-preview",
     contents: { parts },
     config: {
@@ -460,12 +481,12 @@ var analyzeBloomTaxonomy = async (assignmentText, fileData) => {
         required: ["currentSkills", "suggestedSkills"]
       }
     }
-  });
+  }));
   const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
   return JSON.parse(cleanedText);
 };
 var generateAssessmentStrategies = async (skills, numStudents) => {
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: "gemini-3.1-flash-lite-preview",
     contents: `\u05E2\u05D1\u05D5\u05E8 \u05E8\u05E9\u05D9\u05DE\u05EA \u05D4\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05D4\u05D1\u05D0\u05D4 \u05D5\u05DB\u05D9\u05EA\u05D4 \u05E9\u05DC ${numStudents} \u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD, \u05D1\u05E0\u05D4 \u05EA\u05D4\u05DC\u05D9\u05DA \u05D4\u05E2\u05E8\u05DB\u05D4 \u05D4\u05DE\u05D5\u05E8\u05DB\u05D1 \u05DE-2 \u05E2\u05D3 3 \u05D7\u05DC\u05E7\u05D9\u05DD (\u05E7\u05D1\u05D5\u05E6\u05D5\u05EA \u05D4\u05E2\u05E8\u05DB\u05D4).
     
@@ -502,7 +523,7 @@ var generateAssessmentStrategies = async (skills, numStudents) => {
         }
       }
     }
-  });
+  }));
   const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
   let res = JSON.parse(cleanedText);
   if (res && !Array.isArray(res)) {
@@ -518,7 +539,7 @@ var rephraseAssignment = async (originalText, targetSkills, strategies, numStude
     FaceToFace: "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E1\u05D1\u05D9\u05D1\u05D4 \u05DE\u05D1\u05D5\u05E7\u05E8\u05EA",
     Submission: "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E1\u05D1\u05D9\u05D1\u05D4 \u05E4\u05EA\u05D5\u05D7\u05D4"
   };
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: "gemini-3.1-flash-lite-preview",
     contents: `\u05E0\u05E1\u05D7 \u05DE\u05D7\u05D3\u05E9 \u05D0\u05EA \u05D4\u05DE\u05D8\u05DC\u05D4 \u05D4\u05DE\u05E7\u05D5\u05E8\u05D9\u05EA \u05DC\u05DE\u05D8\u05DC\u05D4 \u05D0\u05E7\u05D3\u05DE\u05D9\u05EA \u05DE\u05E2\u05D5\u05D3\u05DB\u05E0\u05EA. \u05D4\u05DE\u05D8\u05E8\u05D4 \u05D4\u05D9\u05D0 \u05D9\u05E6\u05D9\u05E8\u05EA "\u05DE\u05E9\u05D9\u05DE\u05EA \u05D4\u05E2\u05E8\u05DB\u05D4" \u05E9\u05DC\u05DE\u05D4 \u05D5\u05DE\u05E4\u05D5\u05E8\u05D8\u05EA.
     
@@ -560,7 +581,7 @@ var rephraseAssignment = async (originalText, targetSkills, strategies, numStude
         required: ["sections", "practicalTips"]
       }
     }
-  });
+  }));
   const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
   return JSON.parse(cleanedText);
 };
@@ -571,12 +592,12 @@ var askFollowUpQuestion = async (context, question, history) => {
       systemInstruction: `\u05D0\u05EA\u05D4 \u05E2\u05D5\u05D6\u05E8 \u05E4\u05D3\u05D2\u05D5\u05D2\u05D9 \u05DE\u05D5\u05DE\u05D7\u05D4. \u05D4\u05EA\u05DE\u05E7\u05D3 \u05D1\u05D7\u05D9\u05D1\u05D5\u05E8 \u05DC\u05EA\u05D5\u05DB\u05DF \u05E9\u05E0\u05DC\u05DE\u05D3 \u05D1\u05E9\u05D9\u05E2\u05D5\u05E8 \u05D5\u05D1\u05E9\u05D9\u05D8\u05D5\u05EA \u05D4\u05E2\u05E8\u05DB\u05D4 \u05DE\u05D2\u05D5\u05D5\u05E0\u05D5\u05EA.`
     }
   });
-  const response = await chat.sendMessage({ message: question });
+  const response = await withRetry(() => chat.sendMessage({ message: question }));
   return response.text;
 };
 var generateRubric = async (revisedSections) => {
   const studentInstructions = revisedSections.filter((s) => s.audience === "student").map((s) => s.content).join("\n");
-  const response = await ai.models.generateContent({
+  const response = await withRetry(() => ai.models.generateContent({
     model: "gemini-3.1-flash-lite-preview",
     contents: `\u05E6\u05D5\u05E8 \u05DE\u05D7\u05D5\u05D5\u05DF \u05D4\u05E2\u05E8\u05DB\u05D4 (Rubric) \u05DE\u05DC\u05D0 \u05E2\u05D1\u05D5\u05E8 \u05D4\u05DE\u05D8\u05DC\u05D4 \u05D4\u05D1\u05D0\u05D4.
     \u05D4\u05E7\u05E8\u05D9\u05D8\u05E8\u05D9\u05D5\u05E0\u05D9\u05DD \u05E6\u05E8\u05D9\u05DB\u05D9\u05DD \u05DC\u05DB\u05DC\u05D5\u05DC \u05D4\u05D9\u05D1\u05D8\u05D9\u05DD \u05DB\u05DE\u05D5: \u05D0\u05D9\u05DB\u05D5\u05EA \u05D4\u05EA\u05D5\u05DB\u05DF, \u05D7\u05E9\u05D9\u05D1\u05D4 \u05D1\u05D9\u05E7\u05D5\u05E8\u05EA\u05D9\u05EA, \u05E9\u05D9\u05DE\u05D5\u05E9 \u05DE\u05D5\u05E9\u05DB\u05DC \u05D1-AI (\u05D0\u05DD \u05E8\u05DC\u05D5\u05D5\u05E0\u05D8\u05D9), \u05D0\u05D9\u05DB\u05D5\u05EA \u05D4\u05E4\u05E8\u05D6\u05E0\u05D8\u05E6\u05D9\u05D4/\u05DB\u05EA\u05D9\u05D1\u05D4, \u05D5\u05E8\u05E4\u05DC\u05E7\u05E6\u05D9\u05D4.
@@ -601,7 +622,7 @@ var generateRubric = async (revisedSections) => {
         }
       }
     }
-  });
+  }));
   const cleanedText = response.text.replace(/```json/gi, "").replace(/```/g, "").trim();
   return JSON.parse(cleanedText);
 };
