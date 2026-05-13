@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { InfoBox } from './InfoBox';
+import { useLanguage } from '../i18n';
 
 interface StepInputProps {
   assignmentText: string;
@@ -16,33 +17,34 @@ interface StepInputProps {
 const StepInput: React.FC<StepInputProps> = ({ 
   assignmentText, setAssignmentText, uploadedFile, onFileUpload, numStudents, setNumStudents, onNext, loading 
 }) => {
+  const { t } = useLanguage();
   return (
     <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-      <InfoBox title="תחילת תהליך העיצוב">
-        כאן נגדיר את הבסיס למטלה החדשה. וודא שאתה מזין את מספר הסטודנטים המדויק, שכן העוזר יציע שיטות הערכה בנות-יישום (Scalable) בהתאם לגודל הכיתה.
+      <InfoBox title={t('input.info.title', 'תחילת תהליך העיצוב')}>
+        {t('input.info.content', 'כאן נגדיר את הבסיס למטלה החדשה. וודא שאתה מזין את מספר הסטודנטים המדויק, שכן העוזר יציע שיטות הערכה בנות-יישום (Scalable) בהתאם לגודל הכיתה.')}
       </InfoBox>
       <div className="grid gap-6">
         <div>
-          <label className="block text-lg font-semibold mb-2">הנחיית המטלה לעיצוב מחדש:</label>
+          <label className="block text-lg font-semibold mb-2">{t('input.label.assignment', 'הנחיית המטלה לעיצוב מחדש:')}</label>
           <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-600 mb-1 block">אפשרות א': הדבק טקסט</label>
+                <label className="text-sm text-gray-600 mb-1 block">{t('input.opt.a', 'אפשרות א\': הדבק טקסט')}</label>
                 <textarea 
                   value={assignmentText} 
                   onChange={(e) => setAssignmentText(e.target.value)} 
                   className="w-full h-32 p-4 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" 
-                  placeholder="מה הסטודנטים צריכים לעשות כיום?" 
+                  placeholder={t('input.placeholder', 'מה הסטודנטים צריכים לעשות כיום?')} 
                 />
               </div>
 
               <div className="flex items-center gap-4 my-2">
                 <div className="h-px bg-gray-200 flex-1"></div>
-                <span className="text-gray-400 text-sm font-bold">או</span>
+                <span className="text-gray-400 text-sm font-bold">{t('input.or', 'או')}</span>
                 <div className="h-px bg-gray-200 flex-1"></div>
               </div>
 
               <div>
-                <label className="text-sm text-gray-600 mb-1 block">אפשרות ב': העלה קובץ (PDF / Word)</label>
+                <label className="text-sm text-gray-600 mb-1 block">{t('input.opt.b', 'אפשרות ב\': העלה קובץ (PDF / Word)')}</label>
                 <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group">
                   <input 
                     type="file" 
@@ -57,7 +59,7 @@ const StepInput: React.FC<StepInputProps> = ({
                     {uploadedFile ? (
                         <span className="text-green-700 font-bold">{uploadedFile.name}</span>
                     ) : (
-                      <span className="text-gray-500">לחץ להעלאת קובץ</span>
+                      <span className="text-gray-500">{t('input.upload.hint', 'לחץ להעלאת קובץ')}</span>
                     )}
                   </div>
                 </div>
@@ -65,11 +67,11 @@ const StepInput: React.FC<StepInputProps> = ({
           </div>
         </div>
         <div>
-          <label className="block text-lg font-semibold mb-2">מספר סטודנטים בקורס:</label>
+          <label className="block text-lg font-semibold mb-2">{t('input.label.students', 'מספר סטודנטים בקורס:')}</label>
           <input type="number" value={numStudents} onChange={(e) => setNumStudents(parseInt(e.target.value))} className="w-32 p-3 border rounded-lg font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500" />
         </div>
       </div>
-      <button onClick={onNext} disabled={loading || (!assignmentText && !uploadedFile)} className="mt-8 w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all shadow-md">נתח מיומנויות בטקסונומיית בלום</button>
+      <button onClick={onNext} disabled={loading || (!assignmentText && !uploadedFile)} className="mt-8 w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all shadow-md">{t('input.btn.next', 'נתח מיומנויות בטקסונומיית בלום')}</button>
     </div>
   );
 };

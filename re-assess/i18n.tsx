@@ -5,7 +5,7 @@ export type Language = 'he' | 'en';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, variables?: Record<string, string | number>) => string;
+  t: (key: string, defaultText?: string, variables?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -121,6 +121,51 @@ export const translations: Record<Language, Record<string, string>> = {
     'final.chat.placeholder': 'Ask another question...',
     'final.chat.send': 'Send',
     'final.btn.finish': 'Finish & Return Home',
+
+    // Stepper
+    'step.1': 'Data Input',
+    'step.2': 'Skills Analysis',
+    'step.3': 'Strategies',
+    'step.4': 'Final Output',
+
+    // StepInput
+    'input.info.title': 'Starting the Redesign Process',
+    'input.info.content': 'Here we define the baseline for the new assignment. Make sure to enter the exact number of students, as the assistant will suggest scalable assessment methods accordingly.',
+    'input.label.assignment': 'Assignment guidelines to redesign:',
+    'input.opt.a': 'Option A: Paste text',
+    'input.placeholder': 'What are students required to do currently?',
+    'input.or': 'or',
+    'input.opt.b': 'Option B: Upload File (PDF / Word)',
+    'input.upload.hint': 'Click to upload a file',
+    'input.label.students': 'Number of students in the course:',
+    'input.btn.next': 'Analyze Skills (Bloom\'s Taxonomy)',
+
+    // StepSkillsAnalysis
+    'skills.info.title': 'Mapping Existing Skills',
+    'skills.info.content': 'The AI has identified the following skills in your assignment according to Bloom\'s Taxonomy. <strong>Select the skills you want to keep or emphasize</strong> in the new version.',
+    'skills.title.identified': 'Identified Skills:',
+    'skills.btn.add': 'Add Custom Skill',
+    'skills.title.custom': 'Additional Skills:',
+    'skills.btn.continue': 'Continue to Assessment Strategies',
+    'skills.modal.title': 'Add New Skill',
+    'skills.modal.name': 'Skill Name',
+    'skills.modal.level': 'Bloom Level',
+    'skills.modal.reason': 'Reasoning / Context',
+    'skills.modal.btn.cancel': 'Cancel',
+    'skills.modal.btn.add': 'Add Skill',
+
+    // StepStrategyBuilder
+    'strategy.info.title': 'Assessment Strategy Builder',
+    'strategy.info.content': 'Based on the selected skills, the AI has generated a sequence of assessment strategies. Choose the specific method for each part.',
+    'strategy.col.skills': 'Assessed Skills',
+    'strategy.col.method': 'Assessment Method',
+    'strategy.btn.add.defense': 'Add Oral Defense (Verification)',
+    'strategy.btn.add.group': 'Add New Assessment Group',
+    'strategy.btn.generate': 'Generate Full Assignment',
+    'strategy.type.facetoface': 'Controlled Environment (Face-to-Face)',
+    'strategy.type.submission': 'Open Environment (Submission)',
+    'strategy.method.select': 'Select method...',
+    'strategy.drag.hint': 'Drag skill to another group',
   }
 };
 
@@ -132,8 +177,8 @@ export const LanguageProvider: React.FC<{children: ReactNode}> = ({ children }) 
     document.documentElement.lang = language;
   }, [language]);
 
-  const t = (key: string, variables?: Record<string, string | number>): string => {
-    let text = translations[language][key] || translations['he'][key] || key;
+  const t = (key: string, defaultText?: string, variables?: Record<string, string | number>): string => {
+    let text = translations[language]?.[key] || translations['he']?.[key] || defaultText || key;
     if (variables) {
       Object.keys(variables).forEach(k => {
         text = text.replace(new RegExp(`{${k}}`, 'g'), String(variables[k]));

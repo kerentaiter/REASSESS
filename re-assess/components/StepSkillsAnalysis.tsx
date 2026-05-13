@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { BloomLevel, Skill } from '../types';
 import { InfoBox } from './InfoBox';
+import { useLanguage } from '../i18n';
 
 interface StepSkillsAnalysisProps {
   bloomAnalysis: {currentSkills: Skill[], suggestedSkills: Skill[]} | null;
@@ -17,6 +18,7 @@ interface StepSkillsAnalysisProps {
 const StepSkillsAnalysis: React.FC<StepSkillsAnalysisProps> = ({
   bloomAnalysis, selectedSkills, handleSkillToggle, customSkills, onAddCustomSkill, onNext, onBack, loading
 }) => {
+  const { t } = useLanguage();
   const [newSkillName, setNewSkillName] = useState('');
   const [newSkillLevel, setNewSkillLevel] = useState<BloomLevel>(BloomLevel.Apply);
 
@@ -25,7 +27,7 @@ const StepSkillsAnalysis: React.FC<StepSkillsAnalysisProps> = ({
     const newSkill: Skill = {
       name: newSkillName.trim(),
       bloomLevel: newSkillLevel,
-      reasoning: 'הוספה ידנית על ידי המרצה'
+      reasoning: t('skills.modal.reason', 'הוספה ידנית על ידי המרצה')
     };
     onAddCustomSkill(newSkill);
     setNewSkillName('');
@@ -64,30 +66,30 @@ const StepSkillsAnalysis: React.FC<StepSkillsAnalysisProps> = ({
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border animate-fade-in">
-      <InfoBox title="בחירת מיומנויות יעד">
-        העוזר הפדגוגי ניתח את המטלה וחילק אותה למיומנויות. <strong>סמן ב-V</strong> את המיומנויות שברצונך להעריך במטלה החדשה. תוכל גם להוסיף מיומנויות משלך בתיבה למטה.
+      <InfoBox title={t('skills.info.title', 'בחירת מיומנויות יעד')}>
+        <span dangerouslySetInnerHTML={{__html: t('skills.info.content', 'העוזר הפדגוגי ניתח את המטלה וחילק אותה למיומנויות. <strong>סמן ב-V</strong> את המיומנויות שברצונך להעריך במטלה החדשה. תוכל גם להוסיף מיומנויות משלך בתיבה למטה.')}}></span>
       </InfoBox>
 
       {/* Bloom Taxonomy Chart */}
       <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
-        <h4 className="font-bold text-gray-800 mb-4 text-center">פילוח רמות חשיבה (טקסונומיית בלום)</h4>
+        <h4 className="font-bold text-gray-800 mb-4 text-center">{t('skills.chart.title', 'פילוח רמות חשיבה (טקסונומיית בלום)')}</h4>
         <div className="flex h-12 rounded-full overflow-hidden shadow-inner">
             <div 
                 style={{ width: `${chartData.low}%` }} 
                 className="bg-amber-300 flex items-center justify-center text-amber-900 font-bold text-sm transition-all duration-500"
             >
-                {chartData.low > 5 && `זכירה והבנה (${chartData.low}%)`}
+                {chartData.low > 5 && `${t('skills.chart.low', 'זכירה והבנה')} (${chartData.low}%)`}
             </div>
             <div 
                 style={{ width: `${chartData.high}%` }} 
                 className="bg-indigo-500 flex items-center justify-center text-white font-bold text-sm transition-all duration-500"
             >
-                {chartData.high > 5 && `יישום, אנליזה ויצירה (${chartData.high}%)`}
+                {chartData.high > 5 && `${t('skills.chart.high', 'יישום, אנליזה ויצירה')} (${chartData.high}%)`}
             </div>
         </div>
         <div className="flex justify-between mt-2 text-xs text-gray-500 px-1">
-             <span>רמות חשיבה בסיסיות (חשופות יותר ל-AI)</span>
-             <span>רמות חשיבה גבוהות (למידה עמוקה)</span>
+             <span>{t('skills.chart.low.desc', 'רמות חשיבה בסיסיות (חשופות יותר ל-AI)')}</span>
+             <span>{t('skills.chart.high.desc', 'רמות חשיבה גבוהות (למידה עמוקה)')}</span>
         </div>
       </div>
       
@@ -107,13 +109,13 @@ const StepSkillsAnalysis: React.FC<StepSkillsAnalysisProps> = ({
       </div>
 
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 border-dashed mb-6">
-        <h4 className="font-bold text-gray-800 mb-4">הוסף מיומנות יעד נוספת</h4>
+        <h4 className="font-bold text-gray-800 mb-4">{t('skills.title.custom', 'הוסף מיומנות יעד נוספת')}</h4>
         <div className="flex flex-col md:flex-row gap-4">
           <input 
             type="text" 
             value={newSkillName}
             onChange={(e) => setNewSkillName(e.target.value)}
-            placeholder="שם המיומנות (למשל: עבודה בצוות, פרזנטציה...)"
+            placeholder={t('skills.modal.name', 'שם המיומנות (למשל: עבודה בצוות, פרזנטציה...)')}
             className="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
           />
           <select 
@@ -130,14 +132,14 @@ const StepSkillsAnalysis: React.FC<StepSkillsAnalysisProps> = ({
             disabled={!newSkillName.trim()}
             className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition-all disabled:opacity-50"
           >
-            + הוסף מיומנות
+            + {t('skills.btn.add', 'הוסף מיומנות')}
           </button>
         </div>
       </div>
 
       <div className="flex gap-4 mt-8 pt-6 border-t">
-        <button onClick={onBack} className="px-8 py-3 border rounded-lg font-bold hover:bg-gray-50">חזור</button>
-        <button onClick={onNext} disabled={loading || selectedSkills.length === 0} className="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition-all">המשך לניהול קבוצות מיומנויות</button>
+        <button onClick={onBack} className="px-8 py-3 border rounded-lg font-bold hover:bg-gray-50">{t('back', 'חזור')}</button>
+        <button onClick={onNext} disabled={loading || selectedSkills.length === 0} className="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition-all">{t('skills.btn.continue', 'המשך לניהול קבוצות מיומנויות')}</button>
       </div>
     </div>
   );

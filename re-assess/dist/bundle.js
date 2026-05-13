@@ -112,7 +112,48 @@ var translations = {
     "final.chat.empty": "Ask further questions to refine the task...",
     "final.chat.placeholder": "Ask another question...",
     "final.chat.send": "Send",
-    "final.btn.finish": "Finish & Return Home"
+    "final.btn.finish": "Finish & Return Home",
+    // Stepper
+    "step.1": "Data Input",
+    "step.2": "Skills Analysis",
+    "step.3": "Strategies",
+    "step.4": "Final Output",
+    // StepInput
+    "input.info.title": "Starting the Redesign Process",
+    "input.info.content": "Here we define the baseline for the new assignment. Make sure to enter the exact number of students, as the assistant will suggest scalable assessment methods accordingly.",
+    "input.label.assignment": "Assignment guidelines to redesign:",
+    "input.opt.a": "Option A: Paste text",
+    "input.placeholder": "What are students required to do currently?",
+    "input.or": "or",
+    "input.opt.b": "Option B: Upload File (PDF / Word)",
+    "input.upload.hint": "Click to upload a file",
+    "input.label.students": "Number of students in the course:",
+    "input.btn.next": "Analyze Skills (Bloom's Taxonomy)",
+    // StepSkillsAnalysis
+    "skills.info.title": "Mapping Existing Skills",
+    "skills.info.content": "The AI has identified the following skills in your assignment according to Bloom's Taxonomy. <strong>Select the skills you want to keep or emphasize</strong> in the new version.",
+    "skills.title.identified": "Identified Skills:",
+    "skills.btn.add": "Add Custom Skill",
+    "skills.title.custom": "Additional Skills:",
+    "skills.btn.continue": "Continue to Assessment Strategies",
+    "skills.modal.title": "Add New Skill",
+    "skills.modal.name": "Skill Name",
+    "skills.modal.level": "Bloom Level",
+    "skills.modal.reason": "Reasoning / Context",
+    "skills.modal.btn.cancel": "Cancel",
+    "skills.modal.btn.add": "Add Skill",
+    // StepStrategyBuilder
+    "strategy.info.title": "Assessment Strategy Builder",
+    "strategy.info.content": "Based on the selected skills, the AI has generated a sequence of assessment strategies. Choose the specific method for each part.",
+    "strategy.col.skills": "Assessed Skills",
+    "strategy.col.method": "Assessment Method",
+    "strategy.btn.add.defense": "Add Oral Defense (Verification)",
+    "strategy.btn.add.group": "Add New Assessment Group",
+    "strategy.btn.generate": "Generate Full Assignment",
+    "strategy.type.facetoface": "Controlled Environment (Face-to-Face)",
+    "strategy.type.submission": "Open Environment (Submission)",
+    "strategy.method.select": "Select method...",
+    "strategy.drag.hint": "Drag skill to another group"
   }
 };
 var LanguageProvider = ({ children }) => {
@@ -121,8 +162,8 @@ var LanguageProvider = ({ children }) => {
     document.documentElement.dir = language === "he" ? "rtl" : "ltr";
     document.documentElement.lang = language;
   }, [language]);
-  const t = (key, variables) => {
-    let text = translations[language][key] || translations["he"][key] || key;
+  const t = (key, defaultText, variables) => {
+    let text = translations[language]?.[key] || translations["he"]?.[key] || defaultText || key;
     if (variables) {
       Object.keys(variables).forEach((k) => {
         text = text.replace(new RegExp(`{${k}}`, "g"), String(variables[k]));
@@ -215,31 +256,32 @@ var StepInput = ({
   onNext,
   loading
 }) => {
+  const { t } = useLanguage();
   return /* @__PURE__ */ jsxs3("div", { className: "bg-white p-8 rounded-xl shadow-sm border border-gray-100", children: [
-    /* @__PURE__ */ jsx4(InfoBox, { title: "\u05EA\u05D7\u05D9\u05DC\u05EA \u05EA\u05D4\u05DC\u05D9\u05DA \u05D4\u05E2\u05D9\u05E6\u05D5\u05D1", children: "\u05DB\u05D0\u05DF \u05E0\u05D2\u05D3\u05D9\u05E8 \u05D0\u05EA \u05D4\u05D1\u05E1\u05D9\u05E1 \u05DC\u05DE\u05D8\u05DC\u05D4 \u05D4\u05D7\u05D3\u05E9\u05D4. \u05D5\u05D5\u05D3\u05D0 \u05E9\u05D0\u05EA\u05D4 \u05DE\u05D6\u05D9\u05DF \u05D0\u05EA \u05DE\u05E1\u05E4\u05E8 \u05D4\u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD \u05D4\u05DE\u05D3\u05D5\u05D9\u05E7, \u05E9\u05DB\u05DF \u05D4\u05E2\u05D5\u05D6\u05E8 \u05D9\u05E6\u05D9\u05E2 \u05E9\u05D9\u05D8\u05D5\u05EA \u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E0\u05D5\u05EA-\u05D9\u05D9\u05E9\u05D5\u05DD (Scalable) \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05D2\u05D5\u05D3\u05DC \u05D4\u05DB\u05D9\u05EA\u05D4." }),
+    /* @__PURE__ */ jsx4(InfoBox, { title: t("input.info.title", "\u05EA\u05D7\u05D9\u05DC\u05EA \u05EA\u05D4\u05DC\u05D9\u05DA \u05D4\u05E2\u05D9\u05E6\u05D5\u05D1"), children: t("input.info.content", "\u05DB\u05D0\u05DF \u05E0\u05D2\u05D3\u05D9\u05E8 \u05D0\u05EA \u05D4\u05D1\u05E1\u05D9\u05E1 \u05DC\u05DE\u05D8\u05DC\u05D4 \u05D4\u05D7\u05D3\u05E9\u05D4. \u05D5\u05D5\u05D3\u05D0 \u05E9\u05D0\u05EA\u05D4 \u05DE\u05D6\u05D9\u05DF \u05D0\u05EA \u05DE\u05E1\u05E4\u05E8 \u05D4\u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD \u05D4\u05DE\u05D3\u05D5\u05D9\u05E7, \u05E9\u05DB\u05DF \u05D4\u05E2\u05D5\u05D6\u05E8 \u05D9\u05E6\u05D9\u05E2 \u05E9\u05D9\u05D8\u05D5\u05EA \u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E0\u05D5\u05EA-\u05D9\u05D9\u05E9\u05D5\u05DD (Scalable) \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05D2\u05D5\u05D3\u05DC \u05D4\u05DB\u05D9\u05EA\u05D4.") }),
     /* @__PURE__ */ jsxs3("div", { className: "grid gap-6", children: [
       /* @__PURE__ */ jsxs3("div", { children: [
-        /* @__PURE__ */ jsx4("label", { className: "block text-lg font-semibold mb-2", children: "\u05D4\u05E0\u05D7\u05D9\u05D9\u05EA \u05D4\u05DE\u05D8\u05DC\u05D4 \u05DC\u05E2\u05D9\u05E6\u05D5\u05D1 \u05DE\u05D7\u05D3\u05E9:" }),
+        /* @__PURE__ */ jsx4("label", { className: "block text-lg font-semibold mb-2", children: t("input.label.assignment", "\u05D4\u05E0\u05D7\u05D9\u05D9\u05EA \u05D4\u05DE\u05D8\u05DC\u05D4 \u05DC\u05E2\u05D9\u05E6\u05D5\u05D1 \u05DE\u05D7\u05D3\u05E9:") }),
         /* @__PURE__ */ jsxs3("div", { className: "space-y-4", children: [
           /* @__PURE__ */ jsxs3("div", { children: [
-            /* @__PURE__ */ jsx4("label", { className: "text-sm text-gray-600 mb-1 block", children: "\u05D0\u05E4\u05E9\u05E8\u05D5\u05EA \u05D0': \u05D4\u05D3\u05D1\u05E7 \u05D8\u05E7\u05E1\u05D8" }),
+            /* @__PURE__ */ jsx4("label", { className: "text-sm text-gray-600 mb-1 block", children: t("input.opt.a", "\u05D0\u05E4\u05E9\u05E8\u05D5\u05EA \u05D0': \u05D4\u05D3\u05D1\u05E7 \u05D8\u05E7\u05E1\u05D8") }),
             /* @__PURE__ */ jsx4(
               "textarea",
               {
                 value: assignmentText,
                 onChange: (e) => setAssignmentText(e.target.value),
                 className: "w-full h-32 p-4 border rounded-lg outline-none focus:ring-2 focus:ring-green-500",
-                placeholder: "\u05DE\u05D4 \u05D4\u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD \u05E6\u05E8\u05D9\u05DB\u05D9\u05DD \u05DC\u05E2\u05E9\u05D5\u05EA \u05DB\u05D9\u05D5\u05DD?"
+                placeholder: t("input.placeholder", "\u05DE\u05D4 \u05D4\u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD \u05E6\u05E8\u05D9\u05DB\u05D9\u05DD \u05DC\u05E2\u05E9\u05D5\u05EA \u05DB\u05D9\u05D5\u05DD?")
               }
             )
           ] }),
           /* @__PURE__ */ jsxs3("div", { className: "flex items-center gap-4 my-2", children: [
             /* @__PURE__ */ jsx4("div", { className: "h-px bg-gray-200 flex-1" }),
-            /* @__PURE__ */ jsx4("span", { className: "text-gray-400 text-sm font-bold", children: "\u05D0\u05D5" }),
+            /* @__PURE__ */ jsx4("span", { className: "text-gray-400 text-sm font-bold", children: t("input.or", "\u05D0\u05D5") }),
             /* @__PURE__ */ jsx4("div", { className: "h-px bg-gray-200 flex-1" })
           ] }),
           /* @__PURE__ */ jsxs3("div", { children: [
-            /* @__PURE__ */ jsx4("label", { className: "text-sm text-gray-600 mb-1 block", children: "\u05D0\u05E4\u05E9\u05E8\u05D5\u05EA \u05D1': \u05D4\u05E2\u05DC\u05D4 \u05E7\u05D5\u05D1\u05E5 (PDF / Word)" }),
+            /* @__PURE__ */ jsx4("label", { className: "text-sm text-gray-600 mb-1 block", children: t("input.opt.b", "\u05D0\u05E4\u05E9\u05E8\u05D5\u05EA \u05D1': \u05D4\u05E2\u05DC\u05D4 \u05E7\u05D5\u05D1\u05E5 (PDF / Word)") }),
             /* @__PURE__ */ jsxs3("div", { className: "relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group", children: [
               /* @__PURE__ */ jsx4(
                 "input",
@@ -252,18 +294,18 @@ var StepInput = ({
               ),
               /* @__PURE__ */ jsxs3("div", { className: "flex flex-col items-center justify-center pointer-events-none group-hover:text-green-700 transition-colors", children: [
                 /* @__PURE__ */ jsx4("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-10 w-10 text-gray-400 mb-2 group-hover:text-green-600", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx4("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" }) }),
-                uploadedFile ? /* @__PURE__ */ jsx4("span", { className: "text-green-700 font-bold", children: uploadedFile.name }) : /* @__PURE__ */ jsx4("span", { className: "text-gray-500", children: "\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05DC\u05D0\u05EA \u05E7\u05D5\u05D1\u05E5" })
+                uploadedFile ? /* @__PURE__ */ jsx4("span", { className: "text-green-700 font-bold", children: uploadedFile.name }) : /* @__PURE__ */ jsx4("span", { className: "text-gray-500", children: t("input.upload.hint", "\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05DC\u05D0\u05EA \u05E7\u05D5\u05D1\u05E5") })
               ] })
             ] })
           ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxs3("div", { children: [
-        /* @__PURE__ */ jsx4("label", { className: "block text-lg font-semibold mb-2", children: "\u05DE\u05E1\u05E4\u05E8 \u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD \u05D1\u05E7\u05D5\u05E8\u05E1:" }),
+        /* @__PURE__ */ jsx4("label", { className: "block text-lg font-semibold mb-2", children: t("input.label.students", "\u05DE\u05E1\u05E4\u05E8 \u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD \u05D1\u05E7\u05D5\u05E8\u05E1:") }),
         /* @__PURE__ */ jsx4("input", { type: "number", value: numStudents, onChange: (e) => setNumStudents(parseInt(e.target.value)), className: "w-32 p-3 border rounded-lg font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500" })
       ] })
     ] }),
-    /* @__PURE__ */ jsx4("button", { onClick: onNext, disabled: loading || !assignmentText && !uploadedFile, className: "mt-8 w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all shadow-md", children: "\u05E0\u05EA\u05D7 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05D1\u05D8\u05E7\u05E1\u05D5\u05E0\u05D5\u05DE\u05D9\u05D9\u05EA \u05D1\u05DC\u05D5\u05DD" })
+    /* @__PURE__ */ jsx4("button", { onClick: onNext, disabled: loading || !assignmentText && !uploadedFile, className: "mt-8 w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all shadow-md", children: t("input.btn.next", "\u05E0\u05EA\u05D7 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05D1\u05D8\u05E7\u05E1\u05D5\u05E0\u05D5\u05DE\u05D9\u05D9\u05EA \u05D1\u05DC\u05D5\u05DD") })
   ] });
 };
 var StepInput_default = StepInput;
@@ -294,6 +336,7 @@ var StepSkillsAnalysis = ({
   onBack,
   loading
 }) => {
+  const { t } = useLanguage();
   const [newSkillName, setNewSkillName] = useState2("");
   const [newSkillLevel, setNewSkillLevel] = useState2("\u05D9\u05D9\u05E9\u05D5\u05DD" /* Apply */);
   const handleAdd = () => {
@@ -302,7 +345,7 @@ var StepSkillsAnalysis = ({
     const newSkill = {
       name: newSkillName.trim(),
       bloomLevel: newSkillLevel,
-      reasoning: "\u05D4\u05D5\u05E1\u05E4\u05D4 \u05D9\u05D3\u05E0\u05D9\u05EA \u05E2\u05DC \u05D9\u05D3\u05D9 \u05D4\u05DE\u05E8\u05E6\u05D4"
+      reasoning: t("skills.modal.reason", "\u05D4\u05D5\u05E1\u05E4\u05D4 \u05D9\u05D3\u05E0\u05D9\u05EA \u05E2\u05DC \u05D9\u05D3\u05D9 \u05D4\u05DE\u05E8\u05E6\u05D4")
     };
     onAddCustomSkill(newSkill);
     setNewSkillName("");
@@ -334,20 +377,16 @@ var StepSkillsAnalysis = ({
   if (!bloomAnalysis)
     return null;
   return /* @__PURE__ */ jsxs4("div", { className: "bg-white p-6 rounded-xl shadow-sm border animate-fade-in", children: [
-    /* @__PURE__ */ jsxs4(InfoBox, { title: "\u05D1\u05D7\u05D9\u05E8\u05EA \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05D9\u05E2\u05D3", children: [
-      "\u05D4\u05E2\u05D5\u05D6\u05E8 \u05D4\u05E4\u05D3\u05D2\u05D5\u05D2\u05D9 \u05E0\u05D9\u05EA\u05D7 \u05D0\u05EA \u05D4\u05DE\u05D8\u05DC\u05D4 \u05D5\u05D7\u05D9\u05DC\u05E7 \u05D0\u05D5\u05EA\u05D4 \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA. ",
-      /* @__PURE__ */ jsx5("strong", { children: "\u05E1\u05DE\u05DF \u05D1-V" }),
-      " \u05D0\u05EA \u05D4\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05E9\u05D1\u05E8\u05E6\u05D5\u05E0\u05DA \u05DC\u05D4\u05E2\u05E8\u05D9\u05DA \u05D1\u05DE\u05D8\u05DC\u05D4 \u05D4\u05D7\u05D3\u05E9\u05D4. \u05EA\u05D5\u05DB\u05DC \u05D2\u05DD \u05DC\u05D4\u05D5\u05E1\u05D9\u05E3 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05DE\u05E9\u05DC\u05DA \u05D1\u05EA\u05D9\u05D1\u05D4 \u05DC\u05DE\u05D8\u05D4."
-    ] }),
+    /* @__PURE__ */ jsx5(InfoBox, { title: t("skills.info.title", "\u05D1\u05D7\u05D9\u05E8\u05EA \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05D9\u05E2\u05D3"), children: /* @__PURE__ */ jsx5("span", { dangerouslySetInnerHTML: { __html: t("skills.info.content", "\u05D4\u05E2\u05D5\u05D6\u05E8 \u05D4\u05E4\u05D3\u05D2\u05D5\u05D2\u05D9 \u05E0\u05D9\u05EA\u05D7 \u05D0\u05EA \u05D4\u05DE\u05D8\u05DC\u05D4 \u05D5\u05D7\u05D9\u05DC\u05E7 \u05D0\u05D5\u05EA\u05D4 \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA. <strong>\u05E1\u05DE\u05DF \u05D1-V</strong> \u05D0\u05EA \u05D4\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05E9\u05D1\u05E8\u05E6\u05D5\u05E0\u05DA \u05DC\u05D4\u05E2\u05E8\u05D9\u05DA \u05D1\u05DE\u05D8\u05DC\u05D4 \u05D4\u05D7\u05D3\u05E9\u05D4. \u05EA\u05D5\u05DB\u05DC \u05D2\u05DD \u05DC\u05D4\u05D5\u05E1\u05D9\u05E3 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05DE\u05E9\u05DC\u05DA \u05D1\u05EA\u05D9\u05D1\u05D4 \u05DC\u05DE\u05D8\u05D4.") } }) }),
     /* @__PURE__ */ jsxs4("div", { className: "mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200", children: [
-      /* @__PURE__ */ jsx5("h4", { className: "font-bold text-gray-800 mb-4 text-center", children: "\u05E4\u05D9\u05DC\u05D5\u05D7 \u05E8\u05DE\u05D5\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4 (\u05D8\u05E7\u05E1\u05D5\u05E0\u05D5\u05DE\u05D9\u05D9\u05EA \u05D1\u05DC\u05D5\u05DD)" }),
+      /* @__PURE__ */ jsx5("h4", { className: "font-bold text-gray-800 mb-4 text-center", children: t("skills.chart.title", "\u05E4\u05D9\u05DC\u05D5\u05D7 \u05E8\u05DE\u05D5\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4 (\u05D8\u05E7\u05E1\u05D5\u05E0\u05D5\u05DE\u05D9\u05D9\u05EA \u05D1\u05DC\u05D5\u05DD)") }),
       /* @__PURE__ */ jsxs4("div", { className: "flex h-12 rounded-full overflow-hidden shadow-inner", children: [
         /* @__PURE__ */ jsx5(
           "div",
           {
             style: { width: `${chartData.low}%` },
             className: "bg-amber-300 flex items-center justify-center text-amber-900 font-bold text-sm transition-all duration-500",
-            children: chartData.low > 5 && `\u05D6\u05DB\u05D9\u05E8\u05D4 \u05D5\u05D4\u05D1\u05E0\u05D4 (${chartData.low}%)`
+            children: chartData.low > 5 && `${t("skills.chart.low", "\u05D6\u05DB\u05D9\u05E8\u05D4 \u05D5\u05D4\u05D1\u05E0\u05D4")} (${chartData.low}%)`
           }
         ),
         /* @__PURE__ */ jsx5(
@@ -355,13 +394,13 @@ var StepSkillsAnalysis = ({
           {
             style: { width: `${chartData.high}%` },
             className: "bg-indigo-500 flex items-center justify-center text-white font-bold text-sm transition-all duration-500",
-            children: chartData.high > 5 && `\u05D9\u05D9\u05E9\u05D5\u05DD, \u05D0\u05E0\u05DC\u05D9\u05D6\u05D4 \u05D5\u05D9\u05E6\u05D9\u05E8\u05D4 (${chartData.high}%)`
+            children: chartData.high > 5 && `${t("skills.chart.high", "\u05D9\u05D9\u05E9\u05D5\u05DD, \u05D0\u05E0\u05DC\u05D9\u05D6\u05D4 \u05D5\u05D9\u05E6\u05D9\u05E8\u05D4")} (${chartData.high}%)`
           }
         )
       ] }),
       /* @__PURE__ */ jsxs4("div", { className: "flex justify-between mt-2 text-xs text-gray-500 px-1", children: [
-        /* @__PURE__ */ jsx5("span", { children: "\u05E8\u05DE\u05D5\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4 \u05D1\u05E1\u05D9\u05E1\u05D9\u05D5\u05EA (\u05D7\u05E9\u05D5\u05E4\u05D5\u05EA \u05D9\u05D5\u05EA\u05E8 \u05DC-AI)" }),
-        /* @__PURE__ */ jsx5("span", { children: "\u05E8\u05DE\u05D5\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4 \u05D2\u05D1\u05D5\u05D4\u05D5\u05EA (\u05DC\u05DE\u05D9\u05D3\u05D4 \u05E2\u05DE\u05D5\u05E7\u05D4)" })
+        /* @__PURE__ */ jsx5("span", { children: t("skills.chart.low.desc", "\u05E8\u05DE\u05D5\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4 \u05D1\u05E1\u05D9\u05E1\u05D9\u05D5\u05EA (\u05D7\u05E9\u05D5\u05E4\u05D5\u05EA \u05D9\u05D5\u05EA\u05E8 \u05DC-AI)") }),
+        /* @__PURE__ */ jsx5("span", { children: t("skills.chart.high.desc", "\u05E8\u05DE\u05D5\u05EA \u05D7\u05E9\u05D9\u05D1\u05D4 \u05D2\u05D1\u05D5\u05D4\u05D5\u05EA (\u05DC\u05DE\u05D9\u05D3\u05D4 \u05E2\u05DE\u05D5\u05E7\u05D4)") })
       ] })
     ] }),
     /* @__PURE__ */ jsx5("div", { className: "grid gap-3 max-h-[500px] overflow-y-auto pr-2 mb-6", children: bloomAnalysis.currentSkills.concat(bloomAnalysis.suggestedSkills).concat(customSkills).map((skill, idx) => /* @__PURE__ */ jsxs4("div", { className: `flex items-start gap-4 p-4 rounded-xl border transition-all ${selectedSkills.some((s) => s.name === skill.name) ? "bg-indigo-50 border-indigo-400 shadow-sm" : "bg-gray-50 border-gray-200 opacity-80"}`, children: [
@@ -375,7 +414,7 @@ var StepSkillsAnalysis = ({
       ] })
     ] }, idx)) }),
     /* @__PURE__ */ jsxs4("div", { className: "bg-gray-50 p-6 rounded-xl border border-gray-200 border-dashed mb-6", children: [
-      /* @__PURE__ */ jsx5("h4", { className: "font-bold text-gray-800 mb-4", children: "\u05D4\u05D5\u05E1\u05E3 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA \u05D9\u05E2\u05D3 \u05E0\u05D5\u05E1\u05E4\u05EA" }),
+      /* @__PURE__ */ jsx5("h4", { className: "font-bold text-gray-800 mb-4", children: t("skills.title.custom", "\u05D4\u05D5\u05E1\u05E3 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA \u05D9\u05E2\u05D3 \u05E0\u05D5\u05E1\u05E4\u05EA") }),
       /* @__PURE__ */ jsxs4("div", { className: "flex flex-col md:flex-row gap-4", children: [
         /* @__PURE__ */ jsx5(
           "input",
@@ -383,7 +422,7 @@ var StepSkillsAnalysis = ({
             type: "text",
             value: newSkillName,
             onChange: (e) => setNewSkillName(e.target.value),
-            placeholder: "\u05E9\u05DD \u05D4\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA (\u05DC\u05DE\u05E9\u05DC: \u05E2\u05D1\u05D5\u05D3\u05D4 \u05D1\u05E6\u05D5\u05D5\u05EA, \u05E4\u05E8\u05D6\u05E0\u05D8\u05E6\u05D9\u05D4...)",
+            placeholder: t("skills.modal.name", "\u05E9\u05DD \u05D4\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA (\u05DC\u05DE\u05E9\u05DC: \u05E2\u05D1\u05D5\u05D3\u05D4 \u05D1\u05E6\u05D5\u05D5\u05EA, \u05E4\u05E8\u05D6\u05E0\u05D8\u05E6\u05D9\u05D4...)"),
             className: "flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
           }
         ),
@@ -396,20 +435,23 @@ var StepSkillsAnalysis = ({
             children: Object.values(BloomLevel).map((level) => /* @__PURE__ */ jsx5("option", { value: level, children: level }, level))
           }
         ),
-        /* @__PURE__ */ jsx5(
+        /* @__PURE__ */ jsxs4(
           "button",
           {
             onClick: handleAdd,
             disabled: !newSkillName.trim(),
             className: "bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition-all disabled:opacity-50",
-            children: "+ \u05D4\u05D5\u05E1\u05E3 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA"
+            children: [
+              "+ ",
+              t("skills.btn.add", "\u05D4\u05D5\u05E1\u05E3 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA")
+            ]
           }
         )
       ] })
     ] }),
     /* @__PURE__ */ jsxs4("div", { className: "flex gap-4 mt-8 pt-6 border-t", children: [
-      /* @__PURE__ */ jsx5("button", { onClick: onBack, className: "px-8 py-3 border rounded-lg font-bold hover:bg-gray-50", children: "\u05D7\u05D6\u05D5\u05E8" }),
-      /* @__PURE__ */ jsx5("button", { onClick: onNext, disabled: loading || selectedSkills.length === 0, className: "flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition-all", children: "\u05D4\u05DE\u05E9\u05DA \u05DC\u05E0\u05D9\u05D4\u05D5\u05DC \u05E7\u05D1\u05D5\u05E6\u05D5\u05EA \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA" })
+      /* @__PURE__ */ jsx5("button", { onClick: onBack, className: "px-8 py-3 border rounded-lg font-bold hover:bg-gray-50", children: t("back", "\u05D7\u05D6\u05D5\u05E8") }),
+      /* @__PURE__ */ jsx5("button", { onClick: onNext, disabled: loading || selectedSkills.length === 0, className: "flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition-all", children: t("skills.btn.continue", "\u05D4\u05DE\u05E9\u05DA \u05DC\u05E0\u05D9\u05D4\u05D5\u05DC \u05E7\u05D1\u05D5\u05E6\u05D5\u05EA \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA") })
     ] })
   ] });
 };
@@ -454,6 +496,7 @@ var StepStrategyBuilder = ({
   onBack,
   loading
 }) => {
+  const { t } = useLanguage();
   const [inspectedSkill, setInspectedSkill] = useState3(null);
   const shouldShowDefenseSuggestion = (idx, strat) => {
     const isLast = idx === strategies.length - 1;
@@ -462,25 +505,17 @@ var StepStrategyBuilder = ({
     return isLast && isAiSubmission && hasRoomForMore;
   };
   return /* @__PURE__ */ jsx6("div", { className: "space-y-6 animate-fade-in pb-12", children: /* @__PURE__ */ jsxs5("div", { className: "bg-white p-8 rounded-2xl shadow-xl border-t-8 border-indigo-600 relative", children: [
-    /* @__PURE__ */ jsx6(InfoBox, { title: "\u05D1\u05E0\u05D9\u05D9\u05EA \u05EA\u05D4\u05DC\u05D9\u05DA \u05D4\u05D4\u05E2\u05E8\u05DB\u05D4", children: "\u05DC\u05E4\u05E0\u05D9\u05DA \u05D4\u05E6\u05E2\u05D4 \u05DC\u05E8\u05E6\u05E3 \u05D4\u05E2\u05E8\u05DB\u05D4 \u05D4\u05DE\u05D5\u05EA\u05D0\u05DD \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05E9\u05D1\u05D7\u05E8\u05EA. \u05D4\u05E2\u05D5\u05D6\u05E8 \u05D4\u05E4\u05D3\u05D2\u05D5\u05D2\u05D9 \u05E1\u05D9\u05D3\u05E8 \u05D0\u05EA \u05D4\u05D7\u05DC\u05E7\u05D9\u05DD \u05D1\u05E1\u05D3\u05E8 \u05DC\u05D5\u05D2\u05D9 (\u05DC\u05DE\u05E9\u05DC: \u05D9\u05D3\u05E2 \u05DC\u05E4\u05E0\u05D9 \u05D9\u05D9\u05E9\u05D5\u05DD, \u05D0\u05D5 \u05D9\u05E6\u05D9\u05E8\u05D4 \u05DC\u05E4\u05E0\u05D9 \u05D4\u05D2\u05E0\u05D4), \u05D0\u05DA \u05D9\u05E9 \u05DC\u05DA \u05E9\u05DC\u05D9\u05D8\u05D4 \u05DE\u05DC\u05D0\u05D4 \u05DC\u05E9\u05E0\u05D5\u05EA \u05D0\u05EA \u05D4\u05E9\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E1\u05D3\u05E8." }),
+    /* @__PURE__ */ jsx6(InfoBox, { title: t("strategy.info.title", "\u05D1\u05E0\u05D9\u05D9\u05EA \u05EA\u05D4\u05DC\u05D9\u05DA \u05D4\u05D4\u05E2\u05E8\u05DB\u05D4"), children: /* @__PURE__ */ jsx6("span", { dangerouslySetInnerHTML: { __html: t("strategy.info.content", "\u05DC\u05E4\u05E0\u05D9\u05DA \u05D4\u05E6\u05E2\u05D4 \u05DC\u05E8\u05E6\u05E3 \u05D4\u05E2\u05E8\u05DB\u05D4 \u05D4\u05DE\u05D5\u05EA\u05D0\u05DD \u05DC\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA \u05E9\u05D1\u05D7\u05E8\u05EA.<br/>\u05D4\u05E2\u05D5\u05D6\u05E8 \u05D4\u05E4\u05D3\u05D2\u05D5\u05D2\u05D9 \u05E1\u05D9\u05D3\u05E8 \u05D0\u05EA \u05D4\u05D7\u05DC\u05E7\u05D9\u05DD \u05D1\u05E1\u05D3\u05E8 \u05DC\u05D5\u05D2\u05D9 (\u05DC\u05DE\u05E9\u05DC: \u05D9\u05D3\u05E2 \u05DC\u05E4\u05E0\u05D9 \u05D9\u05D9\u05E9\u05D5\u05DD, \u05D0\u05D5 \u05D9\u05E6\u05D9\u05E8\u05D4 \u05DC\u05E4\u05E0\u05D9 \u05D4\u05D2\u05E0\u05D4), \u05D0\u05DA \u05D9\u05E9 \u05DC\u05DA \u05E9\u05DC\u05D9\u05D8\u05D4 \u05DE\u05DC\u05D0\u05D4 \u05DC\u05E9\u05E0\u05D5\u05EA \u05D0\u05EA \u05D4\u05E9\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E1\u05D3\u05E8.") } }) }),
     /* @__PURE__ */ jsxs5("div", { className: "flex justify-between items-center mb-6", children: [
       /* @__PURE__ */ jsxs5("div", { children: [
-        /* @__PURE__ */ jsx6("h3", { className: "text-2xl font-bold text-indigo-900", children: "\u05E8\u05E6\u05E3 \u05D4\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D4\u05DE\u05D5\u05E6\u05E2" }),
-        /* @__PURE__ */ jsxs5("p", { className: "text-gray-600", children: [
-          "\u05D4\u05EA\u05D0\u05DD \u05D0\u05EA \u05D4\u05E7\u05D1\u05D5\u05E6\u05D5\u05EA \u05DC\u05E4\u05D9 \u05E9\u05D9\u05E7\u05D5\u05DC \u05D3\u05E2\u05EA\u05DA. \u05D4\u05E2\u05D5\u05D6\u05E8 \u05DE\u05EA\u05D7\u05E9\u05D1 \u05D1-",
-          numStudents,
-          " \u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD."
-        ] })
+        /* @__PURE__ */ jsx6("h3", { className: "text-2xl font-bold text-indigo-900", children: t("strategy.header", "\u05E8\u05E6\u05E3 \u05D4\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D4\u05DE\u05D5\u05E6\u05E2") }),
+        /* @__PURE__ */ jsx6("p", { className: "text-gray-600", children: t("strategy.desc", "\u05D4\u05EA\u05D0\u05DD \u05D0\u05EA \u05D4\u05E7\u05D1\u05D5\u05E6\u05D5\u05EA \u05DC\u05E4\u05D9 \u05E9\u05D9\u05E7\u05D5\u05DC \u05D3\u05E2\u05EA\u05DA. \u05D4\u05E2\u05D5\u05D6\u05E8 \u05DE\u05EA\u05D7\u05E9\u05D1 \u05D1-{numStudents} \u05E1\u05D8\u05D5\u05D3\u05E0\u05D8\u05D9\u05DD.", { numStudents }) })
       ] }),
-      /* @__PURE__ */ jsx6("button", { onClick: () => addNewGroup("\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA \u05D7\u05D3\u05E9\u05D4"), className: "bg-green-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-green-700 transition-all shadow-md", children: "+ \u05D4\u05D5\u05E1\u05E3 \u05D7\u05DC\u05E7" })
+      /* @__PURE__ */ jsx6("button", { onClick: () => addNewGroup("\u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05EA \u05D7\u05D3\u05E9\u05D4"), className: "bg-green-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-green-700 transition-all shadow-md", children: t("strategy.btn.add.group", "+ \u05D4\u05D5\u05E1\u05E3 \u05D7\u05DC\u05E7") })
     ] }),
     /* @__PURE__ */ jsx6("div", { className: "space-y-8", children: strategies.map((strat, idx) => /* @__PURE__ */ jsxs5("div", { className: "p-6 rounded-2xl bg-gray-50 border-2 border-indigo-100 shadow-sm relative overflow-hidden", children: [
-      /* @__PURE__ */ jsxs5("div", { className: "absolute top-0 right-0 bg-indigo-100 text-indigo-800 px-4 py-1 rounded-bl-xl font-bold text-sm", children: [
-        "\u05D7\u05DC\u05E7 ",
-        idx + 1,
-        " \u05D1\u05EA\u05D4\u05DC\u05D9\u05DA"
-      ] }),
-      /* @__PURE__ */ jsx6("h4", { className: "text-sm font-bold text-indigo-400 mb-3 mt-4 uppercase", children: "\u05E7\u05D1\u05D5\u05E6\u05EA \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA" }),
+      /* @__PURE__ */ jsx6("div", { className: "absolute top-0 right-0 bg-indigo-100 text-indigo-800 px-4 py-1 rounded-bl-xl font-bold text-sm", children: t("strategy.part", "\u05D7\u05DC\u05E7 {part}", { part: idx + 1 }) }),
+      /* @__PURE__ */ jsx6("h4", { className: "text-sm font-bold text-indigo-400 mb-3 mt-4 uppercase", children: t("strategy.col.skills", "\u05E7\u05D1\u05D5\u05E6\u05EA \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA") }),
       /* @__PURE__ */ jsx6("div", { className: "flex flex-wrap gap-3 mb-6", children: strat.skills.map((s, i) => /* @__PURE__ */ jsx6("button", { onClick: () => setInspectedSkill({ name: s, groupIdx: idx }), className: `skill-btn flex items-center bg-white text-indigo-900 border-2 border-indigo-200 text-sm px-4 py-2 rounded-xl font-bold shadow-sm ${inspectedSkill?.name === s ? "ring-4 ring-indigo-400" : ""}`, children: s }, i)) }),
       inspectedSkill && inspectedSkill.groupIdx === idx && /* @__PURE__ */ jsxs5("div", { className: "mb-6 p-5 bg-white rounded-xl border-2 border-indigo-500 shadow-lg animate-fade-in", children: [
         /* @__PURE__ */ jsxs5("div", { className: "flex justify-between items-start mb-4", children: [
@@ -488,30 +523,30 @@ var StepStrategyBuilder = ({
           /* @__PURE__ */ jsx6("button", { onClick: () => setInspectedSkill(null), className: "text-gray-400 hover:text-gray-600", children: "\u2715" })
         ] }),
         /* @__PURE__ */ jsxs5("div", { className: "flex flex-wrap gap-2 pt-4 border-t", children: [
-          /* @__PURE__ */ jsx6("span", { className: "text-xs font-bold text-gray-400 w-full mb-1", children: "\u05D4\u05E2\u05D1\u05E8 \u05DC\u05D7\u05DC\u05E7:" }),
-          strategies.map((target, tIdx) => target.id !== strat.id && /* @__PURE__ */ jsxs5("button", { onClick: () => {
+          /* @__PURE__ */ jsx6("span", { className: "text-xs font-bold text-gray-400 w-full mb-1", children: t("strategy.drag.hint", "\u05D4\u05E2\u05D1\u05E8 \u05DC\u05D7\u05DC\u05E7:") }),
+          strategies.map((target, tIdx) => target.id !== strat.id && /* @__PURE__ */ jsx6("button", { onClick: () => {
             moveSkillToGroup(inspectedSkill.name, target.id);
             setInspectedSkill(null);
-          }, className: "bg-indigo-50 text-indigo-700 text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 hover:text-white", children: [
-            "\u05D7\u05DC\u05E7 ",
-            tIdx + 1
-          ] }, target.id)),
-          /* @__PURE__ */ jsx6("button", { onClick: () => {
+          }, className: "bg-indigo-50 text-indigo-700 text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-600 hover:text-white", children: t("strategy.part", "\u05D7\u05DC\u05E7 {part}", { part: tIdx + 1 }) }, target.id)),
+          /* @__PURE__ */ jsxs5("button", { onClick: () => {
             addNewGroup(inspectedSkill.name);
             setInspectedSkill(null);
-          }, className: "bg-green-50 text-green-700 text-xs px-3 py-1.5 rounded-lg hover:bg-green-600 hover:text-white", children: "+ \u05D7\u05DC\u05E7 \u05D7\u05D3\u05E9" })
+          }, className: "bg-green-50 text-green-700 text-xs px-3 py-1.5 rounded-lg hover:bg-green-600 hover:text-white", children: [
+            "+ ",
+            t("strategy.part.new", "\u05D7\u05DC\u05E7 \u05D7\u05D3\u05E9")
+          ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxs5("div", { className: "grid md:grid-cols-2 gap-8 pt-4 border-t", children: [
         /* @__PURE__ */ jsxs5("div", { children: [
-          /* @__PURE__ */ jsx6("label", { className: "block text-sm font-bold text-gray-700 mb-3", children: "\u05E1\u05D5\u05D2 \u05D4\u05E2\u05E8\u05DB\u05D4:" }),
+          /* @__PURE__ */ jsx6("label", { className: "block text-sm font-bold text-gray-700 mb-3", children: t("strategy.type", "\u05E1\u05D5\u05D2 \u05D4\u05E2\u05E8\u05DB\u05D4:") }),
           /* @__PURE__ */ jsxs5("div", { className: "flex gap-4", children: [
-            /* @__PURE__ */ jsx6("button", { onClick: () => updateStrategySelection(idx, "FaceToFace"), className: `flex-1 py-4 rounded-xl font-bold border-2 transition-all ${strat.userSelectedCategory === "FaceToFace" ? "bg-indigo-600 border-indigo-600 text-white shadow-lg" : "bg-white text-gray-400 border-gray-100 hover:border-indigo-200"}`, children: "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E1\u05D1\u05D9\u05D1\u05D4 \u05DE\u05D1\u05D5\u05E7\u05E8\u05EA" }),
-            /* @__PURE__ */ jsx6("button", { onClick: () => updateStrategySelection(idx, "Submission"), className: `flex-1 py-4 rounded-xl font-bold border-2 transition-all ${strat.userSelectedCategory === "Submission" ? "bg-indigo-600 border-indigo-600 text-white shadow-lg" : "bg-white text-gray-400 border-gray-100 hover:border-indigo-200"}`, children: "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E1\u05D1\u05D9\u05D1\u05D4 \u05E4\u05EA\u05D5\u05D7\u05D4" })
+            /* @__PURE__ */ jsx6("button", { onClick: () => updateStrategySelection(idx, "FaceToFace"), className: `flex-1 py-4 rounded-xl font-bold border-2 transition-all ${strat.userSelectedCategory === "FaceToFace" ? "bg-indigo-600 border-indigo-600 text-white shadow-lg" : "bg-white text-gray-400 border-gray-100 hover:border-indigo-200"}`, children: t("strategy.type.facetoface", "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E1\u05D1\u05D9\u05D1\u05D4 \u05DE\u05D1\u05D5\u05E7\u05E8\u05EA") }),
+            /* @__PURE__ */ jsx6("button", { onClick: () => updateStrategySelection(idx, "Submission"), className: `flex-1 py-4 rounded-xl font-bold border-2 transition-all ${strat.userSelectedCategory === "Submission" ? "bg-indigo-600 border-indigo-600 text-white shadow-lg" : "bg-white text-gray-400 border-gray-100 hover:border-indigo-200"}`, children: t("strategy.type.submission", "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05D1\u05E1\u05D1\u05D9\u05D1\u05D4 \u05E4\u05EA\u05D5\u05D7\u05D4") })
           ] })
         ] }),
         strat.userSelectedCategory && /* @__PURE__ */ jsxs5("div", { className: "animate-fade-in", children: [
-          /* @__PURE__ */ jsx6("label", { className: "block text-sm font-bold text-gray-700 mb-3", children: "\u05D1\u05D7\u05D9\u05E8\u05EA \u05E9\u05D9\u05D8\u05D4:" }),
+          /* @__PURE__ */ jsx6("label", { className: "block text-sm font-bold text-gray-700 mb-3", children: t("strategy.method", "\u05D1\u05D7\u05D9\u05E8\u05EA \u05E9\u05D9\u05D8\u05D4:") }),
           /* @__PURE__ */ jsxs5(
             "select",
             {
@@ -519,7 +554,7 @@ var StepStrategyBuilder = ({
               onChange: (e) => updateStrategySelection(idx, strat.userSelectedCategory, e.target.value),
               className: "w-full p-4 border-2 border-indigo-200 rounded-xl bg-white outline-none focus:border-indigo-500 font-medium text-gray-800 shadow-sm appearance-none",
               children: [
-                /* @__PURE__ */ jsx6("option", { value: "", children: "-- \u05D1\u05D7\u05E8 \u05E9\u05D9\u05D8\u05D4 --" }),
+                /* @__PURE__ */ jsx6("option", { value: "", children: t("strategy.method.select", "-- \u05D1\u05D7\u05E8 \u05E9\u05D9\u05D8\u05D4 --") }),
                 (() => {
                   const baseOptions = CATEGORIZED_OPTIONS[strat.userSelectedCategory];
                   const defenseOptions = strat.userSelectedCategory === "FaceToFace" ? CATEGORIZED_OPTIONS.Defense : [];
@@ -530,16 +565,16 @@ var StepStrategyBuilder = ({
             }
           ),
           /* @__PURE__ */ jsxs5("div", { className: "mt-3 bg-blue-50 border border-blue-100 p-3 rounded-lg", children: [
-            /* @__PURE__ */ jsx6("p", { className: "text-xs font-bold text-blue-800 mb-1", children: "\u05E8\u05E6\u05D9\u05D5\u05E0\u05DC \u05E4\u05D3\u05D2\u05D5\u05D2\u05D9 \u05DC\u05E9\u05D9\u05D8\u05D4 \u05D5\u05DC\u05DE\u05D9\u05E7\u05D5\u05DD \u05D1\u05E8\u05E6\u05E3:" }),
+            /* @__PURE__ */ jsx6("p", { className: "text-xs font-bold text-blue-800 mb-1", children: t("strategy.rationale", "\u05E8\u05E6\u05D9\u05D5\u05E0\u05DC \u05E4\u05D3\u05D2\u05D5\u05D2\u05D9 \u05DC\u05E9\u05D9\u05D8\u05D4 \u05D5\u05DC\u05DE\u05D9\u05E7\u05D5\u05DD \u05D1\u05E8\u05E6\u05E3:") }),
             /* @__PURE__ */ jsx6("p", { className: "text-sm text-blue-900 leading-relaxed", children: strat.explanation })
           ] }),
-          shouldShowDefenseSuggestion(idx, strat) && /* @__PURE__ */ jsx6("button", { onClick: () => addNewGroup("\u05DB\u05DC\u05DC\u05D9", true), className: "mt-3 w-full text-xs bg-amber-50 text-amber-700 border border-amber-200 p-2 rounded-lg font-bold hover:bg-amber-100 shadow-sm transition-colors", children: "+ \u05D4\u05E6\u05E2\u05D4: \u05D4\u05D5\u05E1\u05E4\u05EA \u05E9\u05DC\u05D1 \u05D4\u05D2\u05E0\u05D4 (Defense) \u05D1\u05E1\u05D9\u05D5\u05DD \u05D4\u05EA\u05D4\u05DC\u05D9\u05DA" })
+          shouldShowDefenseSuggestion(idx, strat) && /* @__PURE__ */ jsx6("button", { onClick: () => addNewGroup("\u05DB\u05DC\u05DC\u05D9", true), className: "mt-3 w-full text-xs bg-amber-50 text-amber-700 border border-amber-200 p-2 rounded-lg font-bold hover:bg-amber-100 shadow-sm transition-colors", children: t("strategy.btn.add.defense", "+ \u05D4\u05E6\u05E2\u05D4: \u05D4\u05D5\u05E1\u05E4\u05EA \u05E9\u05DC\u05D1 \u05D4\u05D2\u05E0\u05D4 (Defense) \u05D1\u05E1\u05D9\u05D5\u05DD \u05D4\u05EA\u05D4\u05DC\u05D9\u05DA") })
         ] })
       ] })
     ] }, strat.id)) }),
     /* @__PURE__ */ jsxs5("div", { className: "flex gap-4 mt-12 pt-8 border-t", children: [
-      /* @__PURE__ */ jsx6("button", { onClick: onBack, className: "px-10 py-4 border-2 rounded-xl font-bold hover:bg-gray-50 transition-all", children: "\u05D7\u05D6\u05D5\u05E8" }),
-      /* @__PURE__ */ jsx6("button", { onClick: onNext, disabled: loading, className: "flex-1 bg-green-600 text-white py-4 rounded-xl font-bold text-xl shadow-xl hover:bg-green-700 transition-all", children: "\u05E6\u05D5\u05E8 \u05DE\u05D8\u05DC\u05D4 \u05D5\u05E1\u05D9\u05DB\u05D5\u05DD \u05DC\u05DE\u05D9\u05D3\u05D4" })
+      /* @__PURE__ */ jsx6("button", { onClick: onBack, className: "px-10 py-4 border-2 rounded-xl font-bold hover:bg-gray-50 transition-all", children: t("back", "\u05D7\u05D6\u05D5\u05E8") }),
+      /* @__PURE__ */ jsx6("button", { onClick: onNext, disabled: loading, className: "flex-1 bg-green-600 text-white py-4 rounded-xl font-bold text-xl shadow-xl hover:bg-green-700 transition-all", children: t("strategy.btn.generate", "\u05E6\u05D5\u05E8 \u05DE\u05D8\u05DC\u05D4 \u05D5\u05E1\u05D9\u05DB\u05D5\u05DD \u05DC\u05DE\u05D9\u05D3\u05D4") })
     ] })
   ] }) });
 };
@@ -1056,13 +1091,14 @@ var StepFinalResult_default = StepFinalResult;
 
 // ../REASSESS_github/re-assess/components/Stepper.tsx
 import { jsx as jsx8, jsxs as jsxs7 } from "react/jsx-runtime";
-var steps = [
-  { id: 1, label: "\u05D4\u05D6\u05E0\u05EA \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD" },
-  { id: 2, label: "\u05E0\u05D9\u05EA\u05D5\u05D7 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA" },
-  { id: 3, label: "\u05D0\u05E1\u05D8\u05E8\u05D8\u05D2\u05D9\u05D5\u05EA" },
-  { id: 4, label: "\u05EA\u05D5\u05E6\u05E8 \u05E1\u05D5\u05E4\u05D9" }
-];
 var Stepper = ({ currentStep, onStepClick, maxReachedStep }) => {
+  const { t } = useLanguage();
+  const steps = [
+    { id: 1, label: t("step.1", "\u05D4\u05D6\u05E0\u05EA \u05E0\u05EA\u05D5\u05E0\u05D9\u05DD") },
+    { id: 2, label: t("step.2", "\u05E0\u05D9\u05EA\u05D5\u05D7 \u05DE\u05D9\u05D5\u05DE\u05E0\u05D5\u05D9\u05D5\u05EA") },
+    { id: 3, label: t("step.3", "\u05D0\u05E1\u05D8\u05E8\u05D8\u05D2\u05D9\u05D5\u05EA") },
+    { id: 4, label: t("step.4", "\u05EA\u05D5\u05E6\u05E8 \u05E1\u05D5\u05E4\u05D9") }
+  ];
   return /* @__PURE__ */ jsx8("div", { className: "w-full max-w-4xl mx-auto mb-10 px-4", children: /* @__PURE__ */ jsxs7("div", { className: "relative flex items-center justify-between w-full", children: [
     /* @__PURE__ */ jsx8("div", { className: "absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -z-10 transform -translate-y-1/2 rounded-full" }),
     /* @__PURE__ */ jsx8(

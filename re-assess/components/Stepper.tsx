@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useLanguage } from '../i18n';
 
 interface StepperProps {
   currentStep: number;
@@ -7,14 +8,16 @@ interface StepperProps {
   maxReachedStep: number;
 }
 
-const steps = [
-  { id: 1, label: 'הזנת נתונים' },
-  { id: 2, label: 'ניתוח מיומנויות' },
-  { id: 3, label: 'אסטרטגיות' },
-  { id: 4, label: 'תוצר סופי' }
-];
-
 const Stepper: React.FC<StepperProps> = ({ currentStep, onStepClick, maxReachedStep }) => {
+  const { t } = useLanguage();
+  
+  const steps = [
+    { id: 1, label: t('step.1', 'הזנת נתונים') },
+    { id: 2, label: t('step.2', 'ניתוח מיומנויות') },
+    { id: 3, label: t('step.3', 'אסטרטגיות') },
+    { id: 4, label: t('step.4', 'תוצר סופי') }
+  ];
+
   return (
     <div className="w-full max-w-4xl mx-auto mb-10 px-4">
       <div className="relative flex items-center justify-between w-full">
