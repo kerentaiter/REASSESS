@@ -153,6 +153,19 @@ export const translations: Record<Language, Record<string, string>> = {
     'skills.modal.reason': 'Reasoning / Context',
     'skills.modal.btn.cancel': 'Cancel',
     'skills.modal.btn.add': 'Add Skill',
+    'skills.chart.title': 'Cognitive Levels Analysis (Bloom\'s Taxonomy)',
+    'skills.chart.low': 'Remember & Understand',
+    'skills.chart.high': 'Apply, Analyze & Create',
+    'skills.chart.low.desc': 'Basic thinking levels (More exposed to AI)',
+    'skills.chart.high.desc': 'Higher-order thinking levels (Deep learning)',
+    
+    // Bloom Levels
+    'bloom.זכירה': 'Remember',
+    'bloom.הבנה': 'Understand',
+    'bloom.יישום': 'Apply',
+    'bloom.אנליזה': 'Analyze',
+    'bloom.הערכה': 'Evaluate',
+    'bloom.יצירה': 'Create',
 
     // StepStrategyBuilder
     'strategy.info.title': 'Assessment Strategy Builder',

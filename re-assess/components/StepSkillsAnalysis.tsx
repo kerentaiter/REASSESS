@@ -100,7 +100,7 @@ const StepSkillsAnalysis: React.FC<StepSkillsAnalysisProps> = ({
             <div className="flex-1 cursor-pointer" onClick={() => handleSkillToggle(skill)}>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-indigo-900 text-lg">{skill.name}</span>
-                <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full font-semibold">{skill.bloomLevel}</span>
+                <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full font-semibold">{t(`bloom.${skill.bloomLevel}`, skill.bloomLevel)}</span>
               </div>
               <p className="text-sm text-gray-700 mt-1 leading-relaxed">{skill.reasoning}</p>
             </div>
@@ -124,7 +124,7 @@ const StepSkillsAnalysis: React.FC<StepSkillsAnalysisProps> = ({
             className="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
           >
             {Object.values(BloomLevel).map(level => (
-              <option key={level} value={level}>{level}</option>
+              <option key={level} value={level}>{t(`bloom.${level}`, level)}</option>
             ))}
           </select>
           <button 

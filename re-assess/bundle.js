@@ -142,6 +142,18 @@ var translations = {
     "skills.modal.reason": "Reasoning / Context",
     "skills.modal.btn.cancel": "Cancel",
     "skills.modal.btn.add": "Add Skill",
+    "skills.chart.title": "Cognitive Levels Analysis (Bloom's Taxonomy)",
+    "skills.chart.low": "Remember & Understand",
+    "skills.chart.high": "Apply, Analyze & Create",
+    "skills.chart.low.desc": "Basic thinking levels (More exposed to AI)",
+    "skills.chart.high.desc": "Higher-order thinking levels (Deep learning)",
+    // Bloom Levels
+    "bloom.\u05D6\u05DB\u05D9\u05E8\u05D4": "Remember",
+    "bloom.\u05D4\u05D1\u05E0\u05D4": "Understand",
+    "bloom.\u05D9\u05D9\u05E9\u05D5\u05DD": "Apply",
+    "bloom.\u05D0\u05E0\u05DC\u05D9\u05D6\u05D4": "Analyze",
+    "bloom.\u05D4\u05E2\u05E8\u05DB\u05D4": "Evaluate",
+    "bloom.\u05D9\u05E6\u05D9\u05E8\u05D4": "Create",
     // StepStrategyBuilder
     "strategy.info.title": "Assessment Strategy Builder",
     "strategy.info.content": "Based on the selected skills, the AI has generated a sequence of assessment strategies. Choose the specific method for each part.",
@@ -431,7 +443,7 @@ var StepSkillsAnalysis = ({
       /* @__PURE__ */ jsxs4("div", { className: "flex-1 cursor-pointer", onClick: () => handleSkillToggle(skill), children: [
         /* @__PURE__ */ jsxs4("div", { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsx5("span", { className: "font-bold text-indigo-900 text-lg", children: skill.name }),
-          /* @__PURE__ */ jsx5("span", { className: "text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full font-semibold", children: skill.bloomLevel })
+          /* @__PURE__ */ jsx5("span", { className: "text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full font-semibold", children: t(`bloom.${skill.bloomLevel}`, skill.bloomLevel) })
         ] }),
         /* @__PURE__ */ jsx5("p", { className: "text-sm text-gray-700 mt-1 leading-relaxed", children: skill.reasoning })
       ] })
@@ -455,7 +467,7 @@ var StepSkillsAnalysis = ({
             value: newSkillLevel,
             onChange: (e) => setNewSkillLevel(e.target.value),
             className: "p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white",
-            children: Object.values(BloomLevel).map((level) => /* @__PURE__ */ jsx5("option", { value: level, children: level }, level))
+            children: Object.values(BloomLevel).map((level) => /* @__PURE__ */ jsx5("option", { value: level, children: t(`bloom.${level}`, level) }, level))
           }
         ),
         /* @__PURE__ */ jsxs4(
