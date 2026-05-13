@@ -153,7 +153,30 @@ var translations = {
     "strategy.type.facetoface": "Controlled Environment (Face-to-Face)",
     "strategy.type.submission": "Open Environment (Submission)",
     "strategy.method.select": "Select method...",
-    "strategy.drag.hint": "Drag skill to another group"
+    "strategy.drag.hint": "Move to part:",
+    "strategy.part": "Part {part}",
+    "strategy.part.new": "New Part",
+    "strategy.header": "Proposed Assessment Sequence",
+    "strategy.desc": "Adjust the groups as you see fit. The assistant considers {numStudents} students.",
+    "strategy.recommended": "Recommended",
+    "strategy.rationale": "Pedagogical rationale for method and sequence placement:",
+    // Assessment Methods
+    "method.written_exam": "Written In-Class Exam",
+    "method.computer_quiz": "Short Computerized Quiz",
+    "method.oral_exam": "Individual Oral Exam",
+    "method.quick_questions": "Quick Knowledge Questions",
+    "method.group_presentation": "Group Presentation",
+    "method.group_discussion": "Group Discussion Assessment",
+    "method.in_class_writing": "In-Class Writing Assignment",
+    "method.sample_eval": "Sample Evaluation",
+    "method.ai_writing": "Writing Assignment with AI",
+    "method.ai_feedback": "Feedback on AI Output",
+    "method.peer_eval": "Peer Evaluation",
+    "method.self_eval": "Self Evaluation",
+    "method.ai_simulation": "AI-Developed Simulation",
+    "method.reflection_journal": "Reflection Journal",
+    "method.process_doc": "Process Documentation",
+    "method.group_questions": "Questions for Presenting Group"
   }
 };
 var LanguageProvider = ({ children }) => {
@@ -486,6 +509,24 @@ var CATEGORIZED_OPTIONS = {
     "\u05E9\u05D0\u05DC\u05D5\u05EA \u05DC\u05E7\u05D1\u05D5\u05E6\u05EA \u05D4\u05DE\u05D2\u05D9\u05E9\u05D9\u05DD \u05D1\u05DB\u05D9\u05EA\u05D4"
   ]
 };
+var methodKeys = {
+  "\u05DE\u05D1\u05D7\u05DF \u05DB\u05EA\u05D5\u05D1 \u05D1\u05DB\u05D9\u05EA\u05D4": "method.written_exam",
+  "\u05D1\u05D5\u05D7\u05DF \u05DE\u05DE\u05D5\u05D7\u05E9\u05D1 \u05E7\u05E6\u05E8 \u05D1\u05DB\u05D9\u05EA\u05D4": "method.computer_quiz",
+  '\u05D1\u05D7\u05D9\u05E0\u05D4 \u05D0\u05D9\u05E9\u05D9\u05EA \u05D1\u05E2"\u05E4': "method.oral_exam",
+  "\u05E9\u05D0\u05DC\u05D5\u05EA \u05D9\u05D3\u05E2 \u05DE\u05D4\u05D9\u05E8\u05D5\u05EA \u05D1\u05E9\u05D9\u05E2\u05D5\u05E8": "method.quick_questions",
+  "\u05D4\u05E6\u05D2\u05EA \u05EA\u05D5\u05E6\u05E8 \u05E7\u05D1\u05D5\u05E6\u05EA\u05D9": "method.group_presentation",
+  "\u05D4\u05E2\u05E8\u05DB\u05EA \u05D3\u05D9\u05D5\u05DF \u05E7\u05D1\u05D5\u05E6\u05EA\u05D9": "method.group_discussion",
+  "\u05DB\u05EA\u05D9\u05D1\u05D4 \u05D5\u05D4\u05D2\u05E9\u05EA \u05E2\u05D1\u05D5\u05D3\u05D4 \u05D1\u05DB\u05D9\u05EA\u05D4": "method.in_class_writing",
+  "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05DE\u05D3\u05D2\u05DE\u05D9\u05EA": "method.sample_eval",
+  "\u05DB\u05EA\u05D9\u05D1\u05EA \u05DE\u05E9\u05D9\u05DE\u05D4 \u05E2\u05DD AI": "method.ai_writing",
+  "\u05DE\u05E9\u05D5\u05D1 \u05E2\u05DC \u05EA\u05D5\u05E6\u05E8 AI": "method.ai_feedback",
+  "\u05D4\u05E2\u05E8\u05DB\u05EA \u05E2\u05DE\u05D9\u05EA\u05D9\u05DD": "method.peer_eval",
+  "\u05D4\u05E2\u05E8\u05DB\u05D4 \u05E2\u05E6\u05DE\u05D9\u05EA": "method.self_eval",
+  "\u05E1\u05D9\u05DE\u05D5\u05DC\u05E6\u05D9\u05D4 \u05E9\u05E4\u05D5\u05EA\u05D7\u05D4 \u05E2\u05DD AI": "method.ai_simulation",
+  "\u05D9\u05D5\u05DE\u05DF \u05E8\u05E4\u05DC\u05E7\u05E6\u05D9\u05D4": "method.reflection_journal",
+  "\u05EA\u05D9\u05E2\u05D5\u05D3 \u05E9\u05DC\u05D1\u05D9 \u05D4\u05E2\u05D1\u05D5\u05D3\u05D4": "method.process_doc",
+  "\u05E9\u05D0\u05DC\u05D5\u05EA \u05DC\u05E7\u05D1\u05D5\u05E6\u05EA \u05D4\u05DE\u05D2\u05D9\u05E9\u05D9\u05DD \u05D1\u05DB\u05D9\u05EA\u05D4": "method.group_questions"
+};
 var StepStrategyBuilder = ({
   strategies,
   numStudents,
@@ -559,7 +600,10 @@ var StepStrategyBuilder = ({
                   const baseOptions = CATEGORIZED_OPTIONS[strat.userSelectedCategory];
                   const defenseOptions = strat.userSelectedCategory === "FaceToFace" ? CATEGORIZED_OPTIONS.Defense : [];
                   const combined = Array.from(/* @__PURE__ */ new Set([...baseOptions, ...defenseOptions]));
-                  return combined.map((opt) => /* @__PURE__ */ jsx6("option", { value: opt, children: opt === strat.method ? `${opt} (\u05DE\u05D5\u05DE\u05DC\u05E5)` : opt }, opt));
+                  return combined.map((opt) => {
+                    const translatedOpt = t(methodKeys[opt] || opt, opt);
+                    return /* @__PURE__ */ jsx6("option", { value: opt, children: opt === strat.method ? `${translatedOpt} (${t("strategy.recommended", "\u05DE\u05D5\u05DE\u05DC\u05E5")})` : translatedOpt }, opt);
+                  });
                 })()
               ]
             }
@@ -1041,11 +1085,11 @@ ${rows}`;
         ] }),
         rubric && /* @__PURE__ */ jsxs6("div", { className: "bg-white p-6 rounded-2xl border-2 border-indigo-100 shadow-sm animate-fade-in", children: [
           /* @__PURE__ */ jsxs6("div", { className: "flex justify-between items-center mb-4", children: [
-            /* @__PURE__ */ jsx7("div", { className: "text-sm text-gray-500 italic", children: '\u05E0\u05D9\u05EA\u05DF \u05DC\u05E2\u05E8\u05D5\u05DA \u05D0\u05EA \u05D4\u05D8\u05D1\u05DC\u05D4 \u05E2"\u05D9 \u05DC\u05D7\u05D9\u05E6\u05D4 \u05E2\u05DC "\u05E2\u05E8\u05D5\u05DA"' }),
+            /* @__PURE__ */ jsx7("div", { className: "text-sm text-gray-500 italic", children: t("final.rubric.edit.hint", '\u05E0\u05D9\u05EA\u05DF \u05DC\u05E2\u05E8\u05D5\u05DA \u05D0\u05EA \u05D4\u05D8\u05D1\u05DC\u05D4 \u05E2"\u05D9 \u05DC\u05D7\u05D9\u05E6\u05D4 \u05E2\u05DC "\u05E2\u05E8\u05D5\u05DA"') }),
             /* @__PURE__ */ jsxs6("div", { className: "flex gap-2", children: [
-              /* @__PURE__ */ jsx7("button", { onClick: () => setIsRubricEditing(!isRubricEditing), className: `px-4 py-1.5 rounded-lg font-bold text-xs transition-all ${isRubricEditing ? "bg-indigo-600 text-white shadow-inner" : "bg-white border text-indigo-600 hover:bg-indigo-50"}`, children: isRubricEditing ? "\u05E9\u05DE\u05D5\u05E8 \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD" : "\u05E2\u05E8\u05D5\u05DA \u05D8\u05D1\u05DC\u05D4" }),
-              /* @__PURE__ */ jsx7("button", { onClick: copyRubricToClipboard, className: `px-4 py-1.5 rounded-lg font-bold text-xs transition-all border ${rubricCopySuccess ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`, children: rubricCopySuccess ? "\u05D4\u05D5\u05E2\u05EA\u05E7!" : "\u05D4\u05E2\u05EA\u05E7 \u05DE\u05D7\u05D5\u05D5\u05DF" }),
-              /* @__PURE__ */ jsx7("button", { onClick: downloadRubricAsWord, className: "px-4 py-1.5 rounded-lg font-bold text-xs transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-sm", children: "\u05D4\u05D5\u05E8\u05D3 \u05DB\u05E7\u05D5\u05D1\u05E5 Word" })
+              /* @__PURE__ */ jsx7("button", { onClick: () => setIsRubricEditing(!isRubricEditing), className: `px-4 py-1.5 rounded-lg font-bold text-xs transition-all ${isRubricEditing ? "bg-indigo-600 text-white shadow-inner" : "bg-white border text-indigo-600 hover:bg-indigo-50"}`, children: isRubricEditing ? t("final.rubric.btn.save", "\u05E9\u05DE\u05D5\u05E8 \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD") : t("final.rubric.btn.edit", "\u05E2\u05E8\u05D5\u05DA \u05D8\u05D1\u05DC\u05D4") }),
+              /* @__PURE__ */ jsx7("button", { onClick: copyRubricToClipboard, className: `px-4 py-1.5 rounded-lg font-bold text-xs transition-all border ${rubricCopySuccess ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`, children: rubricCopySuccess ? t("final.rubric.btn.copied", "\u05D4\u05D5\u05E2\u05EA\u05E7!") : t("final.rubric.btn.copy", "\u05D4\u05E2\u05EA\u05E7 \u05DE\u05D7\u05D5\u05D5\u05DF") }),
+              /* @__PURE__ */ jsx7("button", { onClick: downloadRubricAsWord, className: "px-4 py-1.5 rounded-lg font-bold text-xs transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-sm", children: t("final.rubric.btn.word", "\u05D4\u05D5\u05E8\u05D3 \u05DB\u05E7\u05D5\u05D1\u05E5 Word") })
             ] })
           ] }),
           /* @__PURE__ */ jsx7("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxs6("table", { className: "w-full text-right border-collapse min-w-[800px]", children: [

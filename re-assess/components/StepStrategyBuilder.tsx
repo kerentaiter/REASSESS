@@ -31,6 +31,25 @@ const CATEGORIZED_OPTIONS = {
   ]
 };
 
+const methodKeys: Record<string, string> = {
+  'מבחן כתוב בכיתה': 'method.written_exam',
+  'בוחן ממוחשב קצר בכיתה': 'method.computer_quiz',
+  'בחינה אישית בע"פ': 'method.oral_exam',
+  'שאלות ידע מהירות בשיעור': 'method.quick_questions',
+  'הצגת תוצר קבוצתי': 'method.group_presentation',
+  'הערכת דיון קבוצתי': 'method.group_discussion',
+  'כתיבה והגשת עבודה בכיתה': 'method.in_class_writing',
+  'הערכה מדגמית': 'method.sample_eval',
+  'כתיבת משימה עם AI': 'method.ai_writing',
+  'משוב על תוצר AI': 'method.ai_feedback',
+  'הערכת עמיתים': 'method.peer_eval',
+  'הערכה עצמית': 'method.self_eval',
+  'סימולציה שפותחה עם AI': 'method.ai_simulation',
+  'יומן רפלקציה': 'method.reflection_journal',
+  'תיעוד שלבי העבודה': 'method.process_doc',
+  'שאלות לקבוצת המגישים בכיתה': 'method.group_questions'
+};
+
 interface StepStrategyBuilderProps {
   strategies: AssessmentMethod[];
   numStudents: number;
@@ -116,11 +135,14 @@ const StepStrategyBuilder: React.FC<StepStrategyBuilderProps> = ({
                         const baseOptions = CATEGORIZED_OPTIONS[strat.userSelectedCategory];
                         const defenseOptions = strat.userSelectedCategory === 'FaceToFace' ? CATEGORIZED_OPTIONS.Defense : [];
                         const combined = Array.from(new Set([...baseOptions, ...defenseOptions]));
-                        return combined.map(opt => (
-                          <option key={opt} value={opt}>
-                            {opt === strat.method ? `${opt} (מומלץ)` : opt}
-                          </option>
-                        ));
+                        return combined.map(opt => {
+                          const translatedOpt = t(methodKeys[opt] || opt, opt);
+                          return (
+                            <option key={opt} value={opt}>
+                              {opt === strat.method ? `${translatedOpt} (${t('strategy.recommended', 'מומלץ')})` : translatedOpt}
+                            </option>
+                          );
+                        });
                       })()}
                     </select>
                     <div className="mt-3 bg-blue-50 border border-blue-100 p-3 rounded-lg">

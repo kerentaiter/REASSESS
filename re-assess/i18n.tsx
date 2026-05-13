@@ -165,7 +165,31 @@ export const translations: Record<Language, Record<string, string>> = {
     'strategy.type.facetoface': 'Controlled Environment (Face-to-Face)',
     'strategy.type.submission': 'Open Environment (Submission)',
     'strategy.method.select': 'Select method...',
-    'strategy.drag.hint': 'Drag skill to another group',
+    'strategy.drag.hint': 'Move to part:',
+    'strategy.part': 'Part {part}',
+    'strategy.part.new': 'New Part',
+    'strategy.header': 'Proposed Assessment Sequence',
+    'strategy.desc': 'Adjust the groups as you see fit. The assistant considers {numStudents} students.',
+    'strategy.recommended': 'Recommended',
+    'strategy.rationale': 'Pedagogical rationale for method and sequence placement:',
+    
+    // Assessment Methods
+    'method.written_exam': 'Written In-Class Exam',
+    'method.computer_quiz': 'Short Computerized Quiz',
+    'method.oral_exam': 'Individual Oral Exam',
+    'method.quick_questions': 'Quick Knowledge Questions',
+    'method.group_presentation': 'Group Presentation',
+    'method.group_discussion': 'Group Discussion Assessment',
+    'method.in_class_writing': 'In-Class Writing Assignment',
+    'method.sample_eval': 'Sample Evaluation',
+    'method.ai_writing': 'Writing Assignment with AI',
+    'method.ai_feedback': 'Feedback on AI Output',
+    'method.peer_eval': 'Peer Evaluation',
+    'method.self_eval': 'Self Evaluation',
+    'method.ai_simulation': 'AI-Developed Simulation',
+    'method.reflection_journal': 'Reflection Journal',
+    'method.process_doc': 'Process Documentation',
+    'method.group_questions': 'Questions for Presenting Group',
   }
 };
 

@@ -292,16 +292,16 @@ const StepFinalResult: React.FC<StepFinalResultProps> = ({
             {rubric && (
                  <div className="bg-white p-6 rounded-2xl border-2 border-indigo-100 shadow-sm animate-fade-in">
                     <div className="flex justify-between items-center mb-4">
-                        <div className="text-sm text-gray-500 italic">ניתן לערוך את הטבלה ע"י לחיצה על "ערוך"</div>
+                        <div className="text-sm text-gray-500 italic">{t('final.rubric.edit.hint', 'ניתן לערוך את הטבלה ע"י לחיצה על "ערוך"')}</div>
                         <div className="flex gap-2">
                            <button onClick={() => setIsRubricEditing(!isRubricEditing)} className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all ${isRubricEditing ? 'bg-indigo-600 text-white shadow-inner' : 'bg-white border text-indigo-600 hover:bg-indigo-50'}`}>
-                             {isRubricEditing ? 'שמור שינויים' : 'ערוך טבלה'}
+                             {isRubricEditing ? t('final.rubric.btn.save', 'שמור שינויים') : t('final.rubric.btn.edit', 'ערוך טבלה')}
                            </button>
                            <button onClick={copyRubricToClipboard} className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all border ${rubricCopySuccess ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}>
-                             {rubricCopySuccess ? 'הועתק!' : 'העתק מחוון'}
+                             {rubricCopySuccess ? t('final.rubric.btn.copied', 'הועתק!') : t('final.rubric.btn.copy', 'העתק מחוון')}
                            </button>
                            <button onClick={downloadRubricAsWord} className="px-4 py-1.5 rounded-lg font-bold text-xs transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-sm">
-                             הורד כקובץ Word
+                             {t('final.rubric.btn.word', 'הורד כקובץ Word')}
                            </button>
                         </div>
                     </div>
