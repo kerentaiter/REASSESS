@@ -75,19 +75,98 @@ const StepFinalResult: React.FC<StepFinalResultProps> = ({
   const copyRubricToClipboard = () => {
     if (!rubric) return;
     
-    // Create a markdown table string
+    // Fallback to markdown table string for plain text pasting
     const headers = '| קריטריון | מצטיין | טוב / עובר | טעון שיפור |';
     const separator = '|---|---|---|---|';
     const rows = rubric.map(row => 
-      `| ${row.criterion} | ${row.excellent} | ${row.good} | ${row.needsImprovement} |`
+      `| ${row.criterion.replace(/\n/g, ' ')} | ${row.excellent.replace(/\n/g, ' ')} | ${row.good.replace(/\n/g, ' ')} | ${row.needsImprovement.replace(/\n/g, ' ')} |`
     ).join('\n');
-    
     const tableString = `${headers}\n${separator}\n${rows}`;
 
-    navigator.clipboard.writeText(tableString).then(() => {
-      setRubricCopySuccess(true);
-      setTimeout(() => setRubricCopySuccess(false), 2000);
+    let tableHtml = `
+      <table border="1" style="border-collapse: collapse; width: 100%; text-align: right;" dir="rtl">
+        <tr style="background-color: #f3f4f6;">
+          <th style="padding: 10px; border: 1px solid black;">קריטריון</th>
+          <th style="padding: 10px; border: 1px solid black;">מצטיין</th>
+          <th style="padding: 10px; border: 1px solid black;">טוב / עובר</th>
+          <th style="padding: 10px; border: 1px solid black;">טעון שיפור</th>
+        </tr>
+    `;
+    rubric.forEach(row => {
+      tableHtml += `
+        <tr>
+          <td style="padding: 10px; border: 1px solid black; font-weight: bold;">${row.criterion.replace(/\n/g, '<br/>')}</td>
+          <td style="padding: 10px; border: 1px solid black;">${row.excellent.replace(/\n/g, '<br/>')}</td>
+          <td style="padding: 10px; border: 1px solid black;">${row.good.replace(/\n/g, '<br/>')}</td>
+          <td style="padding: 10px; border: 1px solid black;">${row.needsImprovement.replace(/\n/g, '<br/>')}</td>
+        </tr>
+      `;
     });
+    tableHtml += `</table>`;
+
+    try {
+      const typeText = "text/plain";
+      const typeHtml = "text/html";
+      const blobText = new Blob([tableString], { type: typeText });
+      const blobHtml = new Blob([tableHtml], { type: typeHtml });
+      const data = [new ClipboardItem({ [typeText]: blobText, [typeHtml]: blobHtml })];
+
+      navigator.clipboard.write(data).then(() => {
+        setRubricCopySuccess(true);
+        setTimeout(() => setRubricCopySuccess(false), 2000);
+      });
+    } catch (err) {
+      // Fallback for older browsers
+      navigator.clipboard.writeText(tableString).then(() => {
+        setRubricCopySuccess(true);
+        setTimeout(() => setRubricCopySuccess(false), 2000);
+      });
+    }
+  };
+
+  const downloadRubricAsWord = () => {
+    if (!rubric) return;
+    
+    let tableHtml = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>מחוון הערכה</title></head>
+      <body dir="rtl" style="font-family: Arial, sans-serif;">
+        <h2 style="text-align: center;">מחוון הערכה למטלה</h2>
+        <table border="1" style="border-collapse: collapse; width: 100%; text-align: right;" dir="rtl">
+          <tr style="background-color: #e0e7ff;">
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">קריטריון</th>
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">מצטיין</th>
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">טוב / עובר</th>
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">טעון שיפור</th>
+          </tr>
+    `;
+
+    rubric.forEach(row => {
+      tableHtml += `
+          <tr>
+            <td style="padding: 10px; border: 1px solid black; font-weight: bold;">${row.criterion.replace(/\n/g, '<br/>')}</td>
+            <td style="padding: 10px; border: 1px solid black;">${row.excellent.replace(/\n/g, '<br/>')}</td>
+            <td style="padding: 10px; border: 1px solid black;">${row.good.replace(/\n/g, '<br/>')}</td>
+            <td style="padding: 10px; border: 1px solid black;">${row.needsImprovement.replace(/\n/g, '<br/>')}</td>
+          </tr>
+      `;
+    });
+
+    tableHtml += `
+        </table>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob(['\ufeff', tableHtml], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'מחוון_הערכה.doc';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleSendFollowUp = () => {
@@ -218,6 +297,9 @@ const StepFinalResult: React.FC<StepFinalResultProps> = ({
                            </button>
                            <button onClick={copyRubricToClipboard} className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all border ${rubricCopySuccess ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}>
                              {rubricCopySuccess ? 'הועתק!' : 'העתק מחוון'}
+                           </button>
+                           <button onClick={downloadRubricAsWord} className="px-4 py-1.5 rounded-lg font-bold text-xs transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-sm">
+                             הורד כקובץ Word
                            </button>
                         </div>
                     </div>

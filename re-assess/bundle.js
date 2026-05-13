@@ -677,15 +677,88 @@ ${s.content.replace(/\*/g, "")}`).join("\n\n---\n\n");
     const headers = "| \u05E7\u05E8\u05D9\u05D8\u05E8\u05D9\u05D5\u05DF | \u05DE\u05E6\u05D8\u05D9\u05D9\u05DF | \u05D8\u05D5\u05D1 / \u05E2\u05D5\u05D1\u05E8 | \u05D8\u05E2\u05D5\u05DF \u05E9\u05D9\u05E4\u05D5\u05E8 |";
     const separator = "|---|---|---|---|";
     const rows = rubric.map(
-      (row) => `| ${row.criterion} | ${row.excellent} | ${row.good} | ${row.needsImprovement} |`
+      (row) => `| ${row.criterion.replace(/\n/g, " ")} | ${row.excellent.replace(/\n/g, " ")} | ${row.good.replace(/\n/g, " ")} | ${row.needsImprovement.replace(/\n/g, " ")} |`
     ).join("\n");
     const tableString = `${headers}
 ${separator}
 ${rows}`;
-    navigator.clipboard.writeText(tableString).then(() => {
-      setRubricCopySuccess(true);
-      setTimeout(() => setRubricCopySuccess(false), 2e3);
+    let tableHtml = `
+      <table border="1" style="border-collapse: collapse; width: 100%; text-align: right;" dir="rtl">
+        <tr style="background-color: #f3f4f6;">
+          <th style="padding: 10px; border: 1px solid black;">\u05E7\u05E8\u05D9\u05D8\u05E8\u05D9\u05D5\u05DF</th>
+          <th style="padding: 10px; border: 1px solid black;">\u05DE\u05E6\u05D8\u05D9\u05D9\u05DF</th>
+          <th style="padding: 10px; border: 1px solid black;">\u05D8\u05D5\u05D1 / \u05E2\u05D5\u05D1\u05E8</th>
+          <th style="padding: 10px; border: 1px solid black;">\u05D8\u05E2\u05D5\u05DF \u05E9\u05D9\u05E4\u05D5\u05E8</th>
+        </tr>
+    `;
+    rubric.forEach((row) => {
+      tableHtml += `
+        <tr>
+          <td style="padding: 10px; border: 1px solid black; font-weight: bold;">${row.criterion.replace(/\n/g, "<br/>")}</td>
+          <td style="padding: 10px; border: 1px solid black;">${row.excellent.replace(/\n/g, "<br/>")}</td>
+          <td style="padding: 10px; border: 1px solid black;">${row.good.replace(/\n/g, "<br/>")}</td>
+          <td style="padding: 10px; border: 1px solid black;">${row.needsImprovement.replace(/\n/g, "<br/>")}</td>
+        </tr>
+      `;
     });
+    tableHtml += `</table>`;
+    try {
+      const typeText = "text/plain";
+      const typeHtml = "text/html";
+      const blobText = new Blob([tableString], { type: typeText });
+      const blobHtml = new Blob([tableHtml], { type: typeHtml });
+      const data = [new ClipboardItem({ [typeText]: blobText, [typeHtml]: blobHtml })];
+      navigator.clipboard.write(data).then(() => {
+        setRubricCopySuccess(true);
+        setTimeout(() => setRubricCopySuccess(false), 2e3);
+      });
+    } catch (err) {
+      navigator.clipboard.writeText(tableString).then(() => {
+        setRubricCopySuccess(true);
+        setTimeout(() => setRubricCopySuccess(false), 2e3);
+      });
+    }
+  };
+  const downloadRubricAsWord = () => {
+    if (!rubric)
+      return;
+    let tableHtml = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>\u05DE\u05D7\u05D5\u05D5\u05DF \u05D4\u05E2\u05E8\u05DB\u05D4</title></head>
+      <body dir="rtl" style="font-family: Arial, sans-serif;">
+        <h2 style="text-align: center;">\u05DE\u05D7\u05D5\u05D5\u05DF \u05D4\u05E2\u05E8\u05DB\u05D4 \u05DC\u05DE\u05D8\u05DC\u05D4</h2>
+        <table border="1" style="border-collapse: collapse; width: 100%; text-align: right;" dir="rtl">
+          <tr style="background-color: #e0e7ff;">
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">\u05E7\u05E8\u05D9\u05D8\u05E8\u05D9\u05D5\u05DF</th>
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">\u05DE\u05E6\u05D8\u05D9\u05D9\u05DF</th>
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">\u05D8\u05D5\u05D1 / \u05E2\u05D5\u05D1\u05E8</th>
+            <th style="padding: 10px; width: 25%; border: 1px solid black;">\u05D8\u05E2\u05D5\u05DF \u05E9\u05D9\u05E4\u05D5\u05E8</th>
+          </tr>
+    `;
+    rubric.forEach((row) => {
+      tableHtml += `
+          <tr>
+            <td style="padding: 10px; border: 1px solid black; font-weight: bold;">${row.criterion.replace(/\n/g, "<br/>")}</td>
+            <td style="padding: 10px; border: 1px solid black;">${row.excellent.replace(/\n/g, "<br/>")}</td>
+            <td style="padding: 10px; border: 1px solid black;">${row.good.replace(/\n/g, "<br/>")}</td>
+            <td style="padding: 10px; border: 1px solid black;">${row.needsImprovement.replace(/\n/g, "<br/>")}</td>
+          </tr>
+      `;
+    });
+    tableHtml += `
+        </table>
+      </body>
+      </html>
+    `;
+    const blob = new Blob(["\uFEFF", tableHtml], { type: "application/msword" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "\u05DE\u05D7\u05D5\u05D5\u05DF_\u05D4\u05E2\u05E8\u05DB\u05D4.doc";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
   const handleSendFollowUp = () => {
     if (!followUpQuestion.trim())
@@ -784,7 +857,8 @@ ${rows}`;
             /* @__PURE__ */ jsx6("div", { className: "text-sm text-gray-500 italic", children: '\u05E0\u05D9\u05EA\u05DF \u05DC\u05E2\u05E8\u05D5\u05DA \u05D0\u05EA \u05D4\u05D8\u05D1\u05DC\u05D4 \u05E2"\u05D9 \u05DC\u05D7\u05D9\u05E6\u05D4 \u05E2\u05DC "\u05E2\u05E8\u05D5\u05DA"' }),
             /* @__PURE__ */ jsxs6("div", { className: "flex gap-2", children: [
               /* @__PURE__ */ jsx6("button", { onClick: () => setIsRubricEditing(!isRubricEditing), className: `px-4 py-1.5 rounded-lg font-bold text-xs transition-all ${isRubricEditing ? "bg-indigo-600 text-white shadow-inner" : "bg-white border text-indigo-600 hover:bg-indigo-50"}`, children: isRubricEditing ? "\u05E9\u05DE\u05D5\u05E8 \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD" : "\u05E2\u05E8\u05D5\u05DA \u05D8\u05D1\u05DC\u05D4" }),
-              /* @__PURE__ */ jsx6("button", { onClick: copyRubricToClipboard, className: `px-4 py-1.5 rounded-lg font-bold text-xs transition-all border ${rubricCopySuccess ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`, children: rubricCopySuccess ? "\u05D4\u05D5\u05E2\u05EA\u05E7!" : "\u05D4\u05E2\u05EA\u05E7 \u05DE\u05D7\u05D5\u05D5\u05DF" })
+              /* @__PURE__ */ jsx6("button", { onClick: copyRubricToClipboard, className: `px-4 py-1.5 rounded-lg font-bold text-xs transition-all border ${rubricCopySuccess ? "bg-green-600 text-white border-green-600" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`, children: rubricCopySuccess ? "\u05D4\u05D5\u05E2\u05EA\u05E7!" : "\u05D4\u05E2\u05EA\u05E7 \u05DE\u05D7\u05D5\u05D5\u05DF" }),
+              /* @__PURE__ */ jsx6("button", { onClick: downloadRubricAsWord, className: "px-4 py-1.5 rounded-lg font-bold text-xs transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-sm", children: "\u05D4\u05D5\u05E8\u05D3 \u05DB\u05E7\u05D5\u05D1\u05E5 Word" })
             ] })
           ] }),
           /* @__PURE__ */ jsx6("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxs6("table", { className: "w-full text-right border-collapse min-w-[800px]", children: [
