@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useLanguage } from './i18n';
 import Layout from './components/Layout';
 import { InfoBox } from './components/InfoBox';
 import StepInput from './components/StepInput';
@@ -38,6 +39,7 @@ const App: React.FC = () => {
   const [revisedSections, setRevisedSections] = useState<SectionState[]>([]);
   const [practicalTips, setPracticalTips] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'model', text: string}[]>([]);
+  const { t, language } = useLanguage();
   
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,7 +62,7 @@ const App: React.FC = () => {
           // Optional: You could notify the user that text was extracted
         } catch (error) {
           console.error("Error reading Word file:", error);
-          alert("שגיאה בקריאת קובץ Word. אנא נסה להעתיק את הטקסט ידנית.");
+          alert(t('error.word'));
         }
       };
       reader.readAsArrayBuffer(file);
@@ -99,7 +101,7 @@ const App: React.FC = () => {
     setLoading(true);
     try {
       const filePayload = uploadedFile ? { data: uploadedFile.data, mimeType: uploadedFile.mimeType } : undefined;
-      const analysis = await analyzeBloomTaxonomy(textToAnalyze, filePayload);
+      const analysis = await analyzeBloomTaxonomy(textToAnalyze, language, filePayload);
       logUsage('start_redesign', { 
         hasFile: !!uploadedFile, 
         textLength: textToAnalyze.length,
@@ -112,7 +114,7 @@ const App: React.FC = () => {
       setMaxReachedStep(Math.max(maxReachedStep, 2));
     } catch (error) {
       console.error(error);
-      alert('שגיאה בניתוח המטלה (שלב 1). פרטי שגיאה: ' + (error instanceof Error ? error.message : JSON.stringify(error)));
+      alert(t('error.analyze') + (error instanceof Error ? error.message : JSON.stringify(error)));
     } finally {
       setLoading(false);
     }
@@ -147,7 +149,7 @@ const App: React.FC = () => {
 
     setLoading(true);
     try {
-      const res = await generateAssessmentStrategies(selectedSkills, numStudents);
+      const res = await generateAssessmentStrategies(selectedSkills, numStudents, language);
       logUsage('generate_strategies', { 
         numSkillsSelected: selectedSkills.length,
         numStudents 
@@ -203,7 +205,7 @@ const App: React.FC = () => {
 
     setLoading(true);
     try {
-      const { sections, practicalTips } = await rephraseAssignment(assignmentText, selectedSkills, strategies, numStudents);
+      const { sections, practicalTips } = await rephraseAssignment(assignmentText, selectedSkills, strategies, numStudents, language);
       logUsage('finish_rephrase', { 
         numSections: sections.length,
         numStrategiesSelected: strategies.filter(s => s.userSelectedMethod).length
@@ -223,7 +225,7 @@ const App: React.FC = () => {
     setChatHistory(prev => [...prev, { role: 'user', text: question }]);
     setLoading(true);
     try {
-      const response = await askFollowUpQuestion({ originalText: assignmentText, revisedTask: revisedSections, strategies }, question, chatHistory);
+      const response = await askFollowUpQuestion({ originalText: assignmentText, revisedTask: revisedSections, strategies }, question, chatHistory, language);
       setChatHistory(prev => [...prev, { role: 'model', text: response || '' }]);
     } catch (error) {
       console.error(error);
@@ -277,7 +279,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <Layout title={mode === 'HOME' ? 'Re-Assess' : 'עיצוב מחדש'} onBack={mode !== 'HOME' ? handleGoBack : undefined}>
+    <Layout title={mode === 'HOME' ? t('app.title') : t('app.title.redesign')} onBack={mode !== 'HOME' ? handleGoBack : undefined}>
       <style>{`
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -295,17 +297,17 @@ const App: React.FC = () => {
       {mode === 'HOME' && (
         <div className="flex flex-col items-center gap-8 py-12">
           <div className="text-center space-y-4">
-            <h2 className="text-4xl font-bold text-gray-800">איך המטלה שלך נראית בעידן ה-AI?</h2>
-            <p className="text-xl text-gray-600 max-w-2xl">שיפור פדגוגיה ועידוד למידה משמעותית באמצעות עיצוב מחדש של דרכי הערכה.</p>
+            <h2 className="text-4xl font-bold text-gray-800">{t('home.hero.title')}</h2>
+            <p className="text-xl text-gray-600 max-w-2xl">{t('home.hero.subtitle')}</p>
           </div>
           
           <div className="bg-amber-50 p-6 rounded-xl border border-amber-200 max-w-3xl w-full text-amber-900 shadow-sm">
             <h3 className="flex items-center gap-2 font-bold text-lg mb-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              טיפ חשוב לפני שמתחילים
+              {t('home.tip.title')}
             </h3>
             <p className="leading-relaxed">
-              לפני שתיגש לעיצוב מחדש, אנו ממליצים מאוד לקחת את המטלה הנוכחית שלך ולנסות לפתור אותה בעצמך באמצעות כלי AI (כמו ChatGPT, Claude, או Gemini). בדיקה זו תאפשר לך לראות במו עיניך באיזו מידה ניתן לקבל תשובה טובה ובכך לעזור לך לתכנן אם ואלו חלקים דורשים עיצוב מחדש, בנוסף כדאי לחשוב איזה ידע ומיומניות נדרשים כדי לשפר את תשובת הבינה ולשקול להכניס אותם לתוך תוכנית הלימודים.
+              {t('home.tip.content')}
             </p>
           </div>
 
@@ -314,8 +316,8 @@ const App: React.FC = () => {
               <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:bg-green-600 group-hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">התחל עיצוב למידה מחדש</h3>
-              <p className="text-gray-600">נתח מיומנויות ושדרג את המערך הפדגוגי לליווי מיטבי של הסטודנטים.</p>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">{t('home.start.title')}</h3>
+              <p className="text-gray-600">{t('home.start.subtitle')}</p>
             </button>
           </div>
         </div>
@@ -385,7 +387,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50">
           <div className="bg-white p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-8 border-2 border-indigo-100 animate-pulse">
             <div className="w-20 h-20 border-8 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-            <div className="text-center"><p className="font-bold text-2xl text-indigo-900 mb-2">מעבד פדגוגיה...</p></div>
+            <div className="text-center"><p className="font-bold text-2xl text-indigo-900 mb-2">{t('loading.processing')}</p></div>
           </div>
         </div>
       )}

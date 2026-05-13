@@ -32,7 +32,7 @@ const withRetry = async <T>(fn: () => Promise<T>, retries = 5, waitMs = 10000): 
 
 // NOTE: testAiAssignment function removed as per requirements to remove that mode.
 
-export const analyzeBloomTaxonomy = async (assignmentText: string, fileData?: { data: string, mimeType: string }) => {
+export const analyzeBloomTaxonomy = async (assignmentText: string, language: 'he' | 'en' = 'he', fileData?: { data: string, mimeType: string }) => {
   const parts: any[] = [];
 
   // Add file if it exists
@@ -53,7 +53,8 @@ export const analyzeBloomTaxonomy = async (assignmentText: string, fileData?: { 
     בעידן הבינה המלאכותית, פעולות זכירה פשוטות (כמו שליפת עובדות) נעשות בקלות ע"י ה-AI ולכן אינן נחשבות כ"למידה" משמעותית.
     בניתוח שלך, ציין תחת רמת ה"זכירה" אך ורק עוגני ידע קריטיים, עקרונות ליבה, או מושגי יסוד שהסטודנט *חייב* להפנים בזיכרון לטווח ארוך כדי לתפקד בתחום, ואי אפשר להסתמך רק על שליפה חיצונית עבורם.
     
-    המטלה (טקסט ו/או קובץ מצורף): ${assignmentText}`
+    המטלה (טקסט ו/או קובץ מצורף): ${assignmentText}
+    ${language === 'en' ? '\n\nCRITICAL INSTRUCTION: You MUST write your ENTIRE response (all text, reasoning, descriptions, and analysis) in English. Do not include any Hebrew.' : ''}`
   });
 
   const response = await withRetry(() => ai.models.generateContent({
@@ -98,7 +99,7 @@ export const analyzeBloomTaxonomy = async (assignmentText: string, fileData?: { 
   return JSON.parse(cleanedText);
 };
 
-export const generateAssessmentStrategies = async (skills: Skill[], numStudents: number) => {
+export const generateAssessmentStrategies = async (skills: Skill[], numStudents: number, language: 'he' | 'en' = 'he') => {
   const response = await withRetry(() => ai.models.generateContent({
     model: 'gemini-3.1-flash-lite-preview',
     contents: `עבור רשימת המיומנויות הבאה וכיתה של ${numStudents} סטודנטים, בנה תהליך הערכה המורכב מ-2 עד 3 חלקים (קבוצות הערכה).
@@ -119,7 +120,8 @@ export const generateAssessmentStrategies = async (skills: Skill[], numStudents:
     FaceToFace (הערכה בסביבה מבוקרת): מבחן כתוב, בוחן ממוחשב, בחינה בע"פ, שאלות ידע בשיעור, הצגת תוצר, הערכת דיון, כתיבה בכיתה, הערכה מדגמית.
     Submission (הערכה בסביבה פתוחה): כתיבת משימה עם AI, משוב על תוצר AI, הערכת עמיתים, הערכה עצמית, סימולציה עם AI, יומן רפלקציה, תיעוד שלבי העבודה.
     
-    המיומנויות שנבחרו: ${JSON.stringify(skills)}`,
+    המיומנויות שנבחרו: ${JSON.stringify(skills)}
+    ${language === 'en' ? '\n\nCRITICAL INSTRUCTION: You MUST write your ENTIRE response (all text, reasoning, descriptions, and analysis) in English. Do not include any Hebrew.' : ''}`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -168,7 +170,7 @@ export interface RubricRow {
   needsImprovement: string;
 }
 
-export const rephraseAssignment = async (originalText: string, targetSkills: Skill[], strategies: AssessmentMethod[], numStudents: number) => {
+export const rephraseAssignment = async (originalText: string, targetSkills: Skill[], strategies: AssessmentMethod[], numStudents: number, language: 'he' | 'en' = 'he') => {
   const labelsMap = {
     FaceToFace: 'הערכה בסביבה מבוקרת',
     Submission: 'הערכה בסביבה פתוחה'
@@ -193,7 +195,8 @@ export const rephraseAssignment = async (originalText: string, targetSkills: Ski
     נתונים לשילוב:
     ${strategies.map((s, idx) => `- אסטרטגיה ${idx + 1}: מיומנויות [${s.skills.join(', ')}] בשיטת "${s.userSelectedMethod}" (סוג: ${labelsMap[s.userSelectedCategory as keyof typeof labelsMap]}).`).join('\n')}
     
-    מטלה מקורית: ${originalText}`,
+    מטלה מקורית: ${originalText}
+    ${language === 'en' ? '\n\nCRITICAL INSTRUCTION: You MUST write your ENTIRE response (all generated titles, content, text, reasoning, descriptions, and practical tips) in English. Do not include any Hebrew. Ensure it is written in a professional, academic tone in English.' : ''}`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -224,19 +227,20 @@ export const rephraseAssignment = async (originalText: string, targetSkills: Ski
 export const askFollowUpQuestion = async (
   context: { originalText: string, revisedTask: TaskSection[], strategies: AssessmentMethod[] },
   question: string,
-  history: { role: 'user' | 'model', text: string }[]
+  history: { role: 'user' | 'model', text: string }[],
+  language: 'he' | 'en' = 'he'
 ) => {
   const chat = ai.chats.create({
     model: 'gemini-3.1-flash-lite-preview',
     config: {
-      systemInstruction: `אתה עוזר פדגוגי מומחה. התמקד בחיבור לתוכן שנלמד בשיעור ובשיטות הערכה מגוונות.`,
+      systemInstruction: `אתה עוזר פדגוגי מומחה. התמקד בחיבור לתוכן שנלמד בשיעור ובשיטות הערכה מגוונות. ${language === 'en' ? 'You MUST answer in English ONLY.' : ''}`,
     }
   });
   const response = await withRetry(() => chat.sendMessage({ message: question }));
   return response.text;
 };
 
-export const generateRubric = async (revisedSections: TaskSection[]) => {
+export const generateRubric = async (revisedSections: TaskSection[], language: 'he' | 'en' = 'he') => {
   const studentInstructions = revisedSections
     .filter(s => s.audience === 'student')
     .map(s => s.content)
@@ -250,6 +254,8 @@ export const generateRubric = async (revisedSections: TaskSection[]) => {
 
     תוכן המטלה:
     ${studentInstructions}
+    
+    ${language === 'en' ? '\n\nCRITICAL INSTRUCTION: You MUST write the ENTIRE rubric in English ONLY (all criteria, performance levels, excellent/good/needs improvement texts).' : ''}
     `,
     config: {
       responseMimeType: "application/json",
