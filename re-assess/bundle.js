@@ -162,6 +162,8 @@ var translations = {
     "strategy.btn.add.defense": "Add Oral Defense (Verification)",
     "strategy.btn.add.group": "Add New Assessment Group",
     "strategy.btn.generate": "Generate Full Assignment",
+    "strategy.type": "Assessment Type:",
+    "strategy.method": "Select Method:",
     "strategy.type.facetoface": "Controlled Environment (Face-to-Face)",
     "strategy.type.submission": "Open Environment (Submission)",
     "strategy.method.select": "Select method...",
