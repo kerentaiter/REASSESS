@@ -6,9 +6,10 @@ interface LayoutProps {
   children: React.ReactNode;
   title: string;
   onBack?: () => void;
+  showLanguageToggle?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title, onBack }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title, onBack, showLanguageToggle }) => {
   const { language, setLanguage, t } = useLanguage();
 
   return (
@@ -29,15 +30,17 @@ const Layout: React.FC<LayoutProps> = ({ children, title, onBack }) => {
           <h1 className="text-3xl font-bold text-indigo-900">{title}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setLanguage(language === 'he' ? 'en' : 'he')}
-            className="flex items-center gap-1 bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 15h2.052M15 6h-6m-3 0V4a2 2 0 012-2h4a2 2 0 012 2v2m-6 0h6" />
-            </svg>
-            {language === 'he' ? 'English' : 'עברית'}
-          </button>
+          {showLanguageToggle && (
+            <button 
+              onClick={() => setLanguage(language === 'he' ? 'en' : 'he')}
+              className="flex items-center gap-1 bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 15h2.052M15 6h-6m-3 0V4a2 2 0 012-2h4a2 2 0 012 2v2m-6 0h6" />
+              </svg>
+              {language === 'he' ? 'English' : 'עברית'}
+            </button>
+          )}
           <div className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
             Re-Assess
           </div>

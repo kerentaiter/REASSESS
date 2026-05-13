@@ -279,7 +279,11 @@ const App: React.FC = () => {
   };
 
   return (
-    <Layout title={mode === 'HOME' ? t('app.title') : t('app.title.redesign')} onBack={mode !== 'HOME' ? handleGoBack : undefined}>
+    <Layout 
+      title={mode === 'HOME' ? t('app.title') : t('app.title.redesign')} 
+      onBack={mode !== 'HOME' ? handleGoBack : undefined}
+      showLanguageToggle={mode === 'HOME'}
+    >
       <style>{`
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }

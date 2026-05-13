@@ -182,7 +182,7 @@ var useLanguage = () => {
 
 // ../REASSESS_github/re-assess/components/Layout.tsx
 import { jsx as jsx2, jsxs } from "react/jsx-runtime";
-var Layout = ({ children, title, onBack }) => {
+var Layout = ({ children, title, onBack, showLanguageToggle }) => {
   const { language, setLanguage, t } = useLanguage();
   return /* @__PURE__ */ jsxs("div", { className: "min-h-screen flex flex-col items-center p-4 md:p-8", children: [
     /* @__PURE__ */ jsxs("header", { className: "w-full max-w-4xl mb-8 flex items-center justify-between", children: [
@@ -199,7 +199,7 @@ var Layout = ({ children, title, onBack }) => {
         /* @__PURE__ */ jsx2("h1", { className: "text-3xl font-bold text-indigo-900", children: title })
       ] }),
       /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxs(
+        showLanguageToggle && /* @__PURE__ */ jsxs(
           "button",
           {
             onClick: () => setLanguage(language === "he" ? "en" : "he"),
@@ -1391,8 +1391,14 @@ var App = () => {
       setStep(targetStep);
     }
   };
-  return /* @__PURE__ */ jsxs8(Layout_default, { title: mode === "HOME" ? t("app.title") : t("app.title.redesign"), onBack: mode !== "HOME" ? handleGoBack : void 0, children: [
-    /* @__PURE__ */ jsx9("style", { children: `
+  return /* @__PURE__ */ jsxs8(
+    Layout_default,
+    {
+      title: mode === "HOME" ? t("app.title") : t("app.title.redesign"),
+      onBack: mode !== "HOME" ? handleGoBack : void 0,
+      showLanguageToggle: mode === "HOME",
+      children: [
+        /* @__PURE__ */ jsx9("style", { children: `
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .skill-btn { transition: all 0.2s; }
@@ -1405,89 +1411,91 @@ var App = () => {
           color: #1f2937;
         }
       ` }),
-    mode === "HOME" && /* @__PURE__ */ jsxs8("div", { className: "flex flex-col items-center gap-8 py-12", children: [
-      /* @__PURE__ */ jsxs8("div", { className: "text-center space-y-4", children: [
-        /* @__PURE__ */ jsx9("h2", { className: "text-4xl font-bold text-gray-800", children: t("home.hero.title") }),
-        /* @__PURE__ */ jsx9("p", { className: "text-xl text-gray-600 max-w-2xl", children: t("home.hero.subtitle") })
-      ] }),
-      /* @__PURE__ */ jsxs8("div", { className: "bg-amber-50 p-6 rounded-xl border border-amber-200 max-w-3xl w-full text-amber-900 shadow-sm", children: [
-        /* @__PURE__ */ jsxs8("h3", { className: "flex items-center gap-2 font-bold text-lg mb-2", children: [
-          /* @__PURE__ */ jsx9("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx9("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }) }),
-          t("home.tip.title")
+        mode === "HOME" && /* @__PURE__ */ jsxs8("div", { className: "flex flex-col items-center gap-8 py-12", children: [
+          /* @__PURE__ */ jsxs8("div", { className: "text-center space-y-4", children: [
+            /* @__PURE__ */ jsx9("h2", { className: "text-4xl font-bold text-gray-800", children: t("home.hero.title") }),
+            /* @__PURE__ */ jsx9("p", { className: "text-xl text-gray-600 max-w-2xl", children: t("home.hero.subtitle") })
+          ] }),
+          /* @__PURE__ */ jsxs8("div", { className: "bg-amber-50 p-6 rounded-xl border border-amber-200 max-w-3xl w-full text-amber-900 shadow-sm", children: [
+            /* @__PURE__ */ jsxs8("h3", { className: "flex items-center gap-2 font-bold text-lg mb-2", children: [
+              /* @__PURE__ */ jsx9("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx9("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }) }),
+              t("home.tip.title")
+            ] }),
+            /* @__PURE__ */ jsx9("p", { className: "leading-relaxed", children: t("home.tip.content") })
+          ] }),
+          /* @__PURE__ */ jsx9("div", { className: "w-full max-w-md", children: /* @__PURE__ */ jsxs8("button", { onClick: () => {
+            setMode("REDESIGN");
+            setStep(1);
+          }, className: "w-full bg-white border-2 border-green-100 p-8 rounded-2xl shadow-sm hover:shadow-md hover:border-green-400 text-center group transition-all", children: [
+            /* @__PURE__ */ jsx9("div", { className: "bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:bg-green-600 group-hover:text-white transition-colors", children: /* @__PURE__ */ jsx9("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx9("path", { d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" }) }) }),
+            /* @__PURE__ */ jsx9("h3", { className: "text-2xl font-bold text-gray-800 mb-2", children: t("home.start.title") }),
+            /* @__PURE__ */ jsx9("p", { className: "text-gray-600", children: t("home.start.subtitle") })
+          ] }) })
         ] }),
-        /* @__PURE__ */ jsx9("p", { className: "leading-relaxed", children: t("home.tip.content") })
-      ] }),
-      /* @__PURE__ */ jsx9("div", { className: "w-full max-w-md", children: /* @__PURE__ */ jsxs8("button", { onClick: () => {
-        setMode("REDESIGN");
-        setStep(1);
-      }, className: "w-full bg-white border-2 border-green-100 p-8 rounded-2xl shadow-sm hover:shadow-md hover:border-green-400 text-center group transition-all", children: [
-        /* @__PURE__ */ jsx9("div", { className: "bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:bg-green-600 group-hover:text-white transition-colors", children: /* @__PURE__ */ jsx9("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-8 w-8", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx9("path", { d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" }) }) }),
-        /* @__PURE__ */ jsx9("h3", { className: "text-2xl font-bold text-gray-800 mb-2", children: t("home.start.title") }),
-        /* @__PURE__ */ jsx9("p", { className: "text-gray-600", children: t("home.start.subtitle") })
-      ] }) })
-    ] }),
-    mode === "REDESIGN" && /* @__PURE__ */ jsxs8("div", { className: "space-y-6 animate-fade-in", children: [
-      /* @__PURE__ */ jsx9(Stepper_default, { currentStep: step, onStepClick: goToStep, maxReachedStep }),
-      step === 1 && /* @__PURE__ */ jsx9(
-        StepInput_default,
-        {
-          assignmentText,
-          setAssignmentText,
-          uploadedFile,
-          onFileUpload: handleFileUpload,
-          numStudents,
-          setNumStudents,
-          onNext: () => startRedesign(),
-          loading
-        }
-      ),
-      step === 2 && bloomAnalysis && /* @__PURE__ */ jsx9(
-        StepSkillsAnalysis_default,
-        {
-          bloomAnalysis,
-          selectedSkills,
-          handleSkillToggle,
-          customSkills,
-          onAddCustomSkill: handleAddCustomSkill,
-          onNext: handleGetInitialStrategies,
-          onBack: handleGoBack,
-          loading
-        }
-      ),
-      step === 3 && strategies.length > 0 && /* @__PURE__ */ jsx9(
-        StepStrategyBuilder_default,
-        {
-          strategies,
-          numStudents,
-          updateStrategySelection,
-          moveSkillToGroup,
-          addNewGroup,
-          onNext: handleFinalRephrase,
-          onBack: handleGoBack,
-          loading
-        }
-      ),
-      step === 4 && /* @__PURE__ */ jsx9(
-        StepFinalResult_default,
-        {
-          revisedSections,
-          practicalTips,
-          updateSectionStatus,
-          updateSectionContent,
-          toggleSectionEdit,
-          chatHistory,
-          onFollowUp: handleFollowUp,
-          onReset: resetToHome,
-          onBack: handleGoBack,
-          loading
-        }
-      )
-    ] }),
-    loading && /* @__PURE__ */ jsx9("div", { className: "fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50", children: /* @__PURE__ */ jsxs8("div", { className: "bg-white p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-8 border-2 border-indigo-100 animate-pulse", children: [
-      /* @__PURE__ */ jsx9("div", { className: "w-20 h-20 border-8 border-indigo-600 border-t-transparent rounded-full animate-spin" }),
-      /* @__PURE__ */ jsx9("div", { className: "text-center", children: /* @__PURE__ */ jsx9("p", { className: "font-bold text-2xl text-indigo-900 mb-2", children: t("loading.processing") }) })
-    ] }) })
-  ] });
+        mode === "REDESIGN" && /* @__PURE__ */ jsxs8("div", { className: "space-y-6 animate-fade-in", children: [
+          /* @__PURE__ */ jsx9(Stepper_default, { currentStep: step, onStepClick: goToStep, maxReachedStep }),
+          step === 1 && /* @__PURE__ */ jsx9(
+            StepInput_default,
+            {
+              assignmentText,
+              setAssignmentText,
+              uploadedFile,
+              onFileUpload: handleFileUpload,
+              numStudents,
+              setNumStudents,
+              onNext: () => startRedesign(),
+              loading
+            }
+          ),
+          step === 2 && bloomAnalysis && /* @__PURE__ */ jsx9(
+            StepSkillsAnalysis_default,
+            {
+              bloomAnalysis,
+              selectedSkills,
+              handleSkillToggle,
+              customSkills,
+              onAddCustomSkill: handleAddCustomSkill,
+              onNext: handleGetInitialStrategies,
+              onBack: handleGoBack,
+              loading
+            }
+          ),
+          step === 3 && strategies.length > 0 && /* @__PURE__ */ jsx9(
+            StepStrategyBuilder_default,
+            {
+              strategies,
+              numStudents,
+              updateStrategySelection,
+              moveSkillToGroup,
+              addNewGroup,
+              onNext: handleFinalRephrase,
+              onBack: handleGoBack,
+              loading
+            }
+          ),
+          step === 4 && /* @__PURE__ */ jsx9(
+            StepFinalResult_default,
+            {
+              revisedSections,
+              practicalTips,
+              updateSectionStatus,
+              updateSectionContent,
+              toggleSectionEdit,
+              chatHistory,
+              onFollowUp: handleFollowUp,
+              onReset: resetToHome,
+              onBack: handleGoBack,
+              loading
+            }
+          )
+        ] }),
+        loading && /* @__PURE__ */ jsx9("div", { className: "fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50", children: /* @__PURE__ */ jsxs8("div", { className: "bg-white p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-8 border-2 border-indigo-100 animate-pulse", children: [
+          /* @__PURE__ */ jsx9("div", { className: "w-20 h-20 border-8 border-indigo-600 border-t-transparent rounded-full animate-spin" }),
+          /* @__PURE__ */ jsx9("div", { className: "text-center", children: /* @__PURE__ */ jsx9("p", { className: "font-bold text-2xl text-indigo-900 mb-2", children: t("loading.processing") }) })
+        ] }) })
+      ]
+    }
+  );
 };
 var App_default = App;
 
